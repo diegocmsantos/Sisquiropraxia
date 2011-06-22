@@ -1,0 +1,199 @@
+{% extends "site_base.html"%}
+{% load i18n %}
+
+
+{% block extra_head %}
+    <link rel="stylesheet" media="screen" href="{{ STATIC_URL }}css/forms.css" />
+{% endblock %}
+
+{% block content %}
+<section>
+			<section class="container_12 clearfix">
+				<div class="portlet grid_12">
+					
+					<section>
+						<form class="form has-validation" method='post' action=".">
+									{% csrf_token %}
+									<section class="grid_12"> 
+												<div class="message info">
+															<h3>{% trans "Paciente" %}</h3> 
+															<p>Nome: {{ client.user.username }}</p>
+															<p>Idade: {{ client.idade }} anos</p>
+															<p>Data de adesão: {{ client.user.date_joined|date:"SHORT_DATE_FORMAT" }}</p>
+															<p>Data da última consulta: {{ last_appointment }}</p>
+												</div>
+									</section> 
+			
+							{% for field in form %}
+								<div id="div_{{ field.auto_id }}" class="clearfix">
+									
+									<label for="form-name" class="form-label">{{ field.label }} {% if field.field.required %}<em>*</em>{% endif %}
+										<small>{{ field.field.help_text }}</small>
+									</label>
+			
+									<div class="form-input">
+										{{ field }}
+										{% if field.errors %}
+											<div class="message error" >{{ field.errors }}</div>
+										{% endif %}
+									</div>
+								</div>
+							{% endfor %}
+			
+							<div class="form-action clearfix">
+			
+								<button class="button" type="submit" data-icon-primary="ui-icon-circle-check">{% trans "Salvar" %}</button>
+			
+								<button class="button" type="reset">{% trans "Limpar" %}</button>
+			
+							</div>
+			
+						</form>
+					</section>
+				</div>
+			</section>
+			<footer class="container_12 clearfix">
+				<div class="grid_12">
+					Copyright &copy; 2011.
+				</div>
+			</footer>
+			</section>
+    </section>
+{% endblock %}
+
+{% block extra_javascript %}
+    <script src="{{ STATIC_URL }}js/jquery.maskedinput-1.3.min.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+        $(document).ready(function() {
+			
+			// Escondendo campos
+            hide_fields();
+			
+			// Manipular escolha do tipo de pagamento
+			payment_way_choose();
+			
+			// Manipular escolha do tipo de pagamento no cartão
+			card_payment_choose();
+        });
+		
+		hide_fields = function() {
+			$('#div_id_card_payment_type').hide();
+            $('#div_id_check_number').hide();
+			$('#div_id_check_date').hide();
+			$('#div_id_quant_parcels').hide();
+			$('#div_id_total_payment').hide();
+		}
+		
+		payment_way_choose = function() {
+			$('#id_payment_type').change(function() {
+			    if (this.value == 0 && this.value != '') {
+				    hide_fields();
+					remove_check_fields();
+				    show_field('#div_id_total_payment');
+					return;
+			    } else if (this.value == 1) {
+				    hide_fields();
+					include_link();
+					return;
+			    } else if (this.value == 2) {
+				    hide_fields();
+					remove_check_fields();
+				    show_field('#div_id_card_payment_type');
+					return;
+				}
+			    hide_fields();
+			});
+		}
+		
+		var id = 1;
+		html_check_fields = function(id) {
+		                html = "<div id=div_inc_check" + id + " class='message info'>" +
+						        "<h3>Cheque " + id + "</h3> " +
+		                        "<div id='div_id_check_number' class='clearfix'>" +
+									"<label for='form-name' class='form-label'>Número <em>*</em>" +
+										"<small></small>" +
+									"</label>" +
+									"<div class='form-input'>" +
+										"<input type='text' name='check_number' id='id_check_number' />" +
+									"</div>" +
+								"</div>" +
+								"<div id='div_id_check_date' class='clearfix'>" +
+									
+									"<label for='form-name' class='form-label'>Data <em>*</em>" +
+
+										"<small></small>" +
+									"</label>" +
+			
+									"<div class='form-input'>" +
+										"<input type='text' name='check_date' id='id_check_date' />" +
+										
+									"</div>" +
+								"</div>" +
+							
+								"<div id='div_id_total_payment' class='clearfix'>" +
+									
+									"<label for='form-name' class='form-label'>Valor <em>*</em>" +
+
+										"<small></small>" +
+									"</label>" +
+			
+									"<div class='form-input'>" +
+										"<input type='text' name='total_payment' id='id_total_payment' />" +
+										
+									"</div>" +
+								"</div>" +
+						    "</div>";
+						this.id++;
+						return html;
+		}
+		
+		include_link = function() {
+			$('#div_id_payment_type').after(
+			    "<div id='div_link' class='clearfix'>" +
+				    "<div class='form-input'>" +
+			            "<a href='#' id='id_insert_check' onclick='insert_check_fields();'>Incluir Cheque</a>" +
+					"</div>" +
+			    "</div>"
+			);
+		}
+		
+		insert_check_fields = function() {
+			var new_id = Number(this.id) -1;
+			var element_exist = $('#div_inc_check' + new_id).length;
+			if (element_exist) {
+			    $('#div_inc_check' + new_id).after(html_check_fields(this.id));
+			} else {
+				$('#div_link').before(html_check_fields(this.id));
+			}
+		}
+		
+		card_payment_choose = function() {
+		    $('#id_card_payment_type').change(function() {
+			    if (this.value == 0) {
+			        hide_field('#div_id_quant_parcels');
+					show_field('#div_id_total_payment');
+			    } else if (this.value == 1) {
+			        show_field('#div_id_quant_parcels');
+					show_field('#div_id_total_payment');
+			    } else {
+			        hide_field('#div_id_quant_parcels');
+					hide_field('#div_id_total_payment');
+				}
+			});
+		}
+		
+		show_field = function(element) {
+			$(element).show();
+		}
+		
+		hide_field = function(element) {
+			$(element).hide();
+		}
+		
+		remove_check_fields = function() {
+			$('#div_link').remove();
+			$('div[id^=div_inc_check]').remove();
+		}
+    </script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "site_base.html"%}
+{% load i18n %}
+
+{% block extra_head %}
+    <!-- DATATABLES CSS -->
+		<link rel="stylesheet" media="screen" href="{{ STATIC_URL }}lib/datatables/css/cleanslate.css" />
+	<!-- DATATABLES CSS END -->
+{% endblock %}
+
+{% block content %}
+    <section>
+        <header class="container_12 clearfix">
+            <div class="grid_12">
+                <h1>{% trans "Listagem" %}</h1>
+            </div>
+        </header>
+        <section class="container_12 clearfix">
+            <div class="grid_12">
+                <div id="demo" class="clearfix"> 
+                    <table class="display" id="example"> 
+                        <thead> 
+                            <tr> 
+                                <th>{% trans "Nome" %}</th> 
+                                <th>{% trans "CPF" %}</th> 
+                                <th>{% trans "Nascimento" %}</th> 
+                                <th>{% trans "Rua" %}</th> 
+                                <th>{% trans "Telefone" %}</th> 
+                            </tr> 
+                        </thead> 
+                        <tbody>
+							{% for doctor in doctors %}
+								<tr class="gradeA"> 
+									<td>{{ doctor.name }}</td> 
+									<td>{{ doctor.cnpf }}</td> 
+									<td>{{ doctor.birthday }}</td> 
+									<td class="center">{{ doctor.address.street }}</td> 
+									<td class="center">{{ doctor.phone }}</td> 
+								</tr>
+							{% endfor %}
+                        </tbody> 
+                    </table> 
+                </div>
+            </div>
+        </section>
+    </section>
+{% endblock %}
+
+{% block extra_javascript %}
+	<!-- DATATABLES -->
+    <script type="text/javascript" src="{{ STATIC_URL }}lib/datatables/js/jquery.dataTables.js"></script> 
+    <script type="text/javascript"> 
+        $(document).ready(function() {
+            $('#example').dataTable( {
+                "sPaginationType": "full_numbers"
+            } );
+        } );
+    </script> 
+    <!-- DATATABLES END -->
+{% endblock %}

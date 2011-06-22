@@ -1,0 +1,72 @@
+{% extends "site_base.html"%}
+{% load i18n %}
+
+{% block extra_head %}
+    <!-- DATATABLES CSS -->
+		<link rel="stylesheet" media="screen" href="{{ STATIC_URL }}lib/datatables/css/cleanslate.css" />
+	<!-- DATATABLES CSS END -->
+{% endblock %}
+
+{% block content %}
+    <section>
+        <header class="container_12 clearfix">
+            <div class="grid_12">
+                <h1>{% trans "Listagem" %}</h1>
+            </div>
+        </header>
+        <section class="container_12 clearfix">
+            <div class="grid_12">
+                <div id="demo" class="clearfix"> 
+                    <table class="display" id="example"> 
+                        <thead> 
+                            <tr> 
+                                <th>{% trans "Nome" %}</th> 
+                                <th>{% trans "CPF" %}</th> 
+                                <th>{% trans "Nascimento" %}</th> 
+                                <th>{% trans "Rua" %}</th> 
+                                <th>{% trans "Telefone" %}</th>
+								<th>{% trans "Ações" %}</th> 
+                            </tr> 
+                        </thead> 
+                        <tbody>
+							{% for client in clients %}
+								<tr class="gradeA"> 
+									<td>{{ client.0.name }}</td> 
+									<td class="center">{{ client.0.cnpf }}</td> 
+									<td class="center">{{ client.0.birthday }}</td> 
+									<td>{{ client.0.address.street }}</td> 
+									<td class="center">{{ client.1.0.phone_number }}</td>
+									<td class="center">
+										<a href="{% url doctor_make_appointment client.0.id %}" id="" name="">consultar</a>
+										| <a href="{% url hostess_make_appointment client.0.id %}" id="" name="">agendar</a>
+										| <a href="{% url edit_client client.0.id %}" id="" name="">editar</a>
+									</td>
+								</tr>
+							{% endfor %}
+                        </tbody> 
+                    </table> 
+                </div>
+            </div>
+        </section>
+    </section>
+{% endblock %}
+
+{% block extra_javascript %}
+	<!-- DATATABLES -->
+    <script type="text/javascript" src="{{ STATIC_URL }}lib/datatables/js/jquery.dataTables.js"></script> 
+    <script type="text/javascript"> 
+        $(document).ready(function() {
+            $('#example').dataTable( {
+                "sPaginationType": "full_numbers",
+				"oLanguage": {
+					"sLengthMenu": "Exibir _MENU_ registros por página",
+					"sZeroRecords": "Nenhum registro encontrado - desculpe",
+					"sInfo": "Exibindo _START_ de _END_ de _TOTAL_ registros",
+					"sInfoEmpty": "Exibindo 0 de 0 de 0 registros",
+					"sInfoFiltered": "(filtrando de _MAX_ total de registros)"
+				}
+            } );
+        } );
+    </script> 
+    <!-- DATATABLES END -->
+{% endblock %}

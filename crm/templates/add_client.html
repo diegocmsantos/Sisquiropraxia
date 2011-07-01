@@ -8,53 +8,76 @@
 {% block content %}
     <section>
                 
-                <section class="container_12 clearfix">
-                    <div class="portlet grid_12">
-                        <header>
-                            <h2>Cadastro</h2>
-                        </header>
-                        <section>
-                            <form class="form has-validation" method='post' action=".">
-                                {% csrf_token %}
-
-                                {% for field in form %}
-                                    <div class="clearfix">
-                                        
-                                        <label for="form-name" class="form-label">{{ field.label }} {% if field.field.required %}<em>*</em>{% endif %}
-                                            <small>{{ field.field.help_text }}</small>
-                                        </label>
-    
-                                        <div class="form-input">
-                                            {{ field }}
-                                            {% if field.errors %}
-                                                <div class="message error" >{{ field.errors }}</div>
-                                            {% endif %}
-                                        </div>
-                                        <!-- <label for="form-name" class="form-label">Name <em>*</em><small>Enter your name</small></label> -->
-    
-                                        <!-- <div class="form-input"><input type="text" id="form-name" name="name" required="required" /></div> -->
-    
-                                    </div>
-                                {% endfor %}
-
-                                <div class="form-action clearfix">
-
-                                    <button class="button" type="submit" data-icon-primary="ui-icon-circle-check">{% trans "Salvar" %}</button>
-
-                                    <button class="button" type="reset">{% trans "Limpar" %}</button>
-
+        <section class="container_12 clearfix">
+            <div class="portlet grid_12">
+                <header>
+                    <h2>Cadastro</h2>
+                </header>
+                <section>
+                    <form class="form has-validation" method='post' action=".">
+                        {% csrf_token %}
+                        
+                        {% if user.get_profile.user_type != '1' %}
+                            {% for field in form %}
+                                <div class="clearfix">
+                                    
+                                    <label for="form-name" class="form-label">{{ field.label }} {% if field.field.required %}<em>*</em>{% endif %}
+                                        <small>{{ field.field.help_text }}</small>
+                                    </label>
+        
+                                    <div class="form-input">
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="message error" >{{ field.errors }}</div>
+                                        {% endif %}
+                                    </div>    
                                 </div>
-
-                            </form>
-                        </section>
-                    </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if user.get_profile.user_type == '1' %}
+                            <div class="clearfix">
+                                <label for="form-name" class="form-label">{{ form.name.label }} {% if form.name.required %}<em>*</em>{% endif %}
+                                    <small>{{ form.name.help_text }}</small>
+                                </label>
+    
+                                <div class="form-input">
+                                    {{ form.name }}
+                                    {% if field.errors %}
+                                        <div class="message error" >{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <label for="form-name" class="form-label">{{ form.cnpf.label }} {% if form.cnpf.required %}<em>*</em>{% endif %}
+                                    <small>{{ form.cnpf.help_text }}</small>
+                                </label>
+    
+                                <div class="form-input">
+                                    {{ form.cnpf }}
+                                    {% if form.errors %}
+                                        <div class="message error" >{{ form.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+    
+                        <div class="form-action clearfix">
+    
+                            <button class="button" type="submit" data-icon-primary="ui-icon-circle-check">{% trans "Salvar" %}</button>
+    
+                            <button class="button" type="reset">{% trans "Limpar" %}</button>
+    
+                        </div>
+    
+                    </form>
                 </section>
-                <footer class="container_12 clearfix">
-                    <div class="grid_12">
-                        Copyright &copy; 2011.
-                    </div>
-                </footer>
-            </section>
+            </div>
+        </section>
+        <footer class="container_12 clearfix">
+            <div class="grid_12">
+                Copyright &copy; 2011.
+            </div>
+        </footer>
     </section>
 {% endblock %}
 

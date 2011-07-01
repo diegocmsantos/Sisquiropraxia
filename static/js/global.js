@@ -36,6 +36,13 @@ $(document).ready(function() {
     $(".accordion").tabs(".accordion > section", {tabs: 'header', effect: 'slide', initialIndex: 0});
     
     $('input[placeholder]').placeholder();
+    
+    $.tools.dateinput.localize("pt-br", {
+      months: 'Janeiro,Fevereiro,Março,Abril,Maio,Junho,Julho,Agosto,Setembro,Outubro,Novembro,Dezembro',
+      shortMonths:  'Jan,Fev,Mar,Abr,Mai,Jun,Jul,Ago,Set,Out,Nov,Dez',
+      days:         'Domingo,Segunda,Terça,Quarta,Quinta,Sexta,Sábado',
+      shortDays:    'Dom,Seg,Ter,Qua,Qui,Sex,Sab'
+   });
 
     $("input[type=date]").dateinput();
 

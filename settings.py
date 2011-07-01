@@ -123,7 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     
@@ -139,6 +139,15 @@ LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/login/'
 
 SITE_NAME = 'Sisquiropraxia'
+
+AUTH_PROFILE_MODULE = 'crm.UserProfile'
+
+# Email configurations
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'diegocmsantos@gmail.com'
+EMAIL_HOST_PASSWORD = 'diegoqwe123'
+EMAIL_PORT = 587
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

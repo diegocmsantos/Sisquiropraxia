@@ -14,7 +14,7 @@
 <meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width">
 <!-- iPad End -->
 
-<title>Sisquiropraxia</title>
+<title>{% block title %}Sisquiropraxia{% endblock %}</title>
 
 <link rel="shortcut icon" href="favicon.ico">
 
@@ -49,6 +49,8 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/selectivizr.js"></script>
 <![endif]-->
 
+{% block extra_head %}{% endblock %}
+
 </head>
 <body class="login" style="overflow: hidden;">
     <div id="loading"> 
@@ -59,31 +61,12 @@
                            "Loading...</p></div>");
         </script> 
 
-    </div>
+    </div> 
+    
     <div class="login-box">
-    	<section class="portlet login-box-top">
-            <header>
-                <h2 class="ac">Redefinir Senha</h2>
-            </header>
-            <section>
-                {% if form.errors %}
-                    <div class="message info">{{ form.errors }}</div>
-                {% endif %}
-                <form id="form" class="has-validation" action="{% url django.contrib.auth.views.password_reset %}" method="post" style="margin-top: 30px">
-                    {% csrf_token %}
-                    <p style="margin-bottom: 30px">
-                        <label for="id_email">E-mail:</label>
-                        <input id="id_email" type="text" name="email" maxlength="75" class="full" required="required" />
-                    </p> 
-                  
-                    <p class="clearfix">
-                      <button class="fr" type="submit">Redefinir</button>
-                      <button id="id_back_button" class="fr" type="button">voltar</button>
-                    </p>
-                  </form>
-</section>
-        </section>
-    </div>
+    {% block content %}{% endblock %}
+	</div>
+    
     <!-- MAIN JAVASCRIPTS -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
     <script>window.jQuery || document.write("<script src='{{ STATIC_URL }}js/jquery.min.js'>\x3C/script>")</script>
@@ -105,30 +88,9 @@
             $('body').removeAttr('style');
         });
     });
-    $(document).ready(function(){
-        $.tools.validator.fn("#username", function(input, value) {
-            return value!='Username' ? true : {     
-                en: "Este campo é obrigatório."
-            };
-        });
-        
-        $.tools.validator.fn("#password", function(input, value) {
-            return value!='Password' ? true : {     
-                en: "Este campo é obrigatório."
-            };
-        });
-
-        $("#form").validator({ 
-            position: 'bottom left', 
-            messageClass:'form-error',
-            message: '<div><em/></div>' // em element is the arrow
-        });
-        
-        $('#id_back_button').click(function() {
-            history.back();
-            return false; 
-        });
-    });
+	
+	{% block extra_javascript %}{% endblock %}
     </script>
     <!-- LOADING SCRIPT -->
 </body>
+</html>

@@ -11,8 +11,8 @@ import datetime
 class Person(models.Model):
     user = models.ForeignKey(User)
     cnpf = models.CharField(_('CPF/CNPJ'), max_length=18)
-    birthday = models.DateField(_('Nascimento'))
-    address = models.ForeignKey('Address')
+    birthday = models.DateField(_('Nascimento'), blank=True, null=True)
+    address = models.ForeignKey('Address', blank=True, null=True)
     billing_account = models.ForeignKey('BillingAccount', \
                                         blank=True, null=True)
         
@@ -21,17 +21,23 @@ class Person(models.Model):
         
     class Meta:
         abstract = True
+        
+class DoctorClientsManager(models.Manager):
+    def get_query_set(self):
+        return super(DoctorClientsManager, self).get_query_set().filter(pk=self.pk)
 
 class Doctor(Person):
     crm = models.CharField(max_length=50)
     clients = models.ManyToManyField('Client')
+    objects = models.Manager() # The default manager.
+    doctor_clients = DoctorClientsManager() # Clients of doctor Manager
     
     class Meta:
         verbose_name = __('Médico')
         verbose_name_plural = __('Médicos')
     
     def __unicode__(self):
-        return self.name
+        return self.crm
     
     def get_absolute_url(self):
         return reverse('crm.views.doctor',
@@ -46,11 +52,27 @@ class Client(Person):
         verbose_name_plural = __('Pacientes')
     
     def __unicode__(self):
-        return self.name
+        return 'paciente'
     
     def get_absolute_url(self):
         return reverse('crm.views.client',
                 kwargs={'id': self.id})
+        
+class UserProfile(models.Model):
+    USER_TYPE = (
+        ('', _('------------')),
+        ('0', _('Administrador Master')),
+        ('1', _('Médico Indicador')),
+        ('2', _('Paciente')),
+        ('3', _('Recepcionista')),
+        ('4', _('Administrador')),
+        ('5', _('Médico')),
+    )
+    user = models.ForeignKey(User)
+    user_type = models.CharField(max_length=1, choices=USER_TYPE)
+        
+class Hostess(models.Model):
+    user = models.ForeignKey(User)
     
 class Address(models.Model):
     street = models.CharField(_('Rua'), max_length=200)
@@ -113,7 +135,7 @@ class Phone(models.Model):
         ('1', _('Comercial')),
         ('2', _('Celular')),
     )
-    client = models.ForeignKey('Client')
+    user = models.ForeignKey(User)
     phone_type = models.CharField(max_length=1, choices=PHONE_TYPE)
     phone_number = models.CharField(_('Telefone'), max_length=14)
     
@@ -156,7 +178,7 @@ class MedicalAppointment(models.Model):
         
 class Section(models.Model):
     medicalAppointment = models.ForeignKey('MedicalAppointment')
-    section_date = models.DateField(_('Data Seção'))
+    section_date = models.DateTimeField(_('Data Seção'))
     section_done = models.BooleanField(default=False)
     
     class Meta:
@@ -165,7 +187,7 @@ class Section(models.Model):
         ordering = ('-section_date',)
     
     def __unicode__(self):
-        return self.appointment_type
+        return self.medicalAppointment.appointment_type
 
 class PaymentWay(models.Model):
     PAYMENT_TYPE = (
@@ -188,6 +210,7 @@ class PaymentWay(models.Model):
         choices=PAYMENT_TYPE)
     card_payment_type = models.CharField(_('Tipo de cartão de crédito'), \
         max_length=1, choices=CARD_PAYMENT_TYPE, blank=True, null=True)
+    paid = models.BooleanField(default=False)
     
     def __unicode__(self):
         return '%s no valor de %s' % (self.payment_type, self.total_payment,)

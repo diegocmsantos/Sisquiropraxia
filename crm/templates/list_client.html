@@ -10,9 +10,6 @@
 {% block content %}
     <section>
         <header class="container_12 clearfix">
-            <div class="grid_12">
-                <h1>{% trans "Listagem" %}</h1>
-            </div>
         </header>
         <section class="container_12 clearfix">
             <div class="grid_12">
@@ -31,20 +28,27 @@
                         <tbody>
 							{% for client in clients %}
 								<tr class="gradeA"> 
-									<td>{{ client.0.name }}</td> 
+									<td>{{ client.0.user.username }}</td> 
 									<td class="center">{{ client.0.cnpf }}</td> 
-									<td class="center">{{ client.0.birthday }}</td> 
-									<td>{{ client.0.address.street }}</td> 
-									<td class="center">{{ client.1.0.phone_number }}</td>
+									<td class="center">{{ client.0.birthday|default:"" }}</td> 
+									<td>{{ client.0.address.street|default:"" }}</td> 
+									<td class="center">{{ client.1.0.phone_number|default:"" }}</td>
 									<td class="center">
-										<a href="{% url doctor_make_appointment client.0.id %}" id="" name="">consultar</a>
-										| <a href="{% url hostess_make_appointment client.0.id %}" id="" name="">agendar</a>
-										| <a href="{% url edit_client client.0.id %}" id="" name="">editar</a>
+										{% if user.get_profile.user_type == '0' %}
+											<a href="{% url doctor_make_appointment client.0.id %}" id="" name="">consultar</a>
+											| <a href="{% url edit_client client.0.id %}" id="" name="">editar</a>
+										{% endif %}
+										{% if user.get_profile.user_type == '3' %}
+											<a href="{% url calendar %}" id="" name="">calendário</a>
+											| <a href="{% url hostess_make_appointment client.0.id %}" id="" name="">agendar</a>
+											| <a href="{% url edit_client client.0.id %}" id="" name="">editar</a>
+										{% endif %}
 									</td>
 								</tr>
 							{% endfor %}
                         </tbody> 
-                    </table> 
+                    </table>
+					<a href="{% url add_client %}">{% trans "Adicionar Paciente" %}</a>
                 </div>
             </div>
         </section>

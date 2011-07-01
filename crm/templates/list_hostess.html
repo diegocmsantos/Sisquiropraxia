@@ -17,23 +17,21 @@
                     <table class="display" id="example"> 
                         <thead> 
                             <tr> 
-                                <th>{% trans "Nome" %}</th> 
-                                <th>{% trans "CPF" %}</th>
-								<th>{% trans "CRM" %}</th>
-                                <th>{% trans "Nascimento" %}</th> 
-                                <th>{% trans "Adesão" %}</th> 
-                                <th>{% trans "Telefone" %}</th> 
+                                <th>{% trans "Nome" %}</th>
+                                <th>{% trans "Email" %}</th>
+                                <th>{% trans "Status" %}</th>
+								<th>{% trans "Ações" %}</th> 
                             </tr> 
                         </thead> 
                         <tbody>
-							{% for doctor in doctors %}
+							{% for hostess in hostesses %}
 								<tr class="gradeA"> 
-									<td>{{ doctor.user.username }}</td> 
-									<td class="center">{{ doctor.cnpf }}</td>
-									<td class="center">{{ doctor.crm }}</td>
-									<td class="center">{{ doctor.birthday }}</td> 
-									<td class="center">{{ doctor.user.date_joined }}</td> 
-									<td class="center">{{ doctor.phone.0 }}</td> 
+									<td>{{ hostess.user.get_full_name }}</td>
+									<td class="center">{{ hostess.user.email }}</td>
+                                    <td class="center">{{ hostess.user.is_active|yesno:"Ativo,Inativo" }}</td> 
+									<td class="center">
+										<a href="#" id="" name="">excluir</a>
+									</td>
 								</tr>
 							{% endfor %}
                         </tbody> 
@@ -50,7 +48,14 @@
     <script type="text/javascript"> 
         $(document).ready(function() {
             $('#example').dataTable( {
-                "sPaginationType": "full_numbers"
+                "sPaginationType": "full_numbers",
+				"oLanguage": {
+					"sLengthMenu": "Exibir _MENU_ registros por página",
+					"sZeroRecords": "Nenhum registro encontrado - desculpe",
+					"sInfo": "Exibindo _START_ de _END_ de _TOTAL_ registros",
+					"sInfoEmpty": "Exibindo 0 de 0 de 0 registros",
+					"sInfoFiltered": "(filtrando de _MAX_ total de registros)"
+				}
             } );
         } );
     </script> 

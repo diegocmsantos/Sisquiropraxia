@@ -8,192 +8,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding model 'Doctor'
-        db.create_table('crm_doctor', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('cnpf', self.gf('django.db.models.fields.CharField')(max_length=18)),
-            ('birthday', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('address', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crm.Address'], null=True, blank=True)),
-            ('billing_account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crm.BillingAccount'], null=True, blank=True)),
-            ('crm', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal('crm', ['Doctor'])
-
-        # Adding M2M table for field clients on 'Doctor'
-        db.create_table('crm_doctor_clients', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('doctor', models.ForeignKey(orm['crm.doctor'], null=False)),
-            ('client', models.ForeignKey(orm['crm.client'], null=False))
-        ))
-        db.create_unique('crm_doctor_clients', ['doctor_id', 'client_id'])
-
-        # Adding model 'Client'
-        db.create_table('crm_client', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('cnpf', self.gf('django.db.models.fields.CharField')(max_length=18)),
-            ('birthday', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('address', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crm.Address'], null=True, blank=True)),
-            ('billing_account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crm.BillingAccount'], null=True, blank=True)),
-        ))
-        db.send_create_signal('crm', ['Client'])
-
-        # Adding M2M table for field medical_appointment on 'Client'
-        db.create_table('crm_client_medical_appointment', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('client', models.ForeignKey(orm['crm.client'], null=False)),
-            ('medicalappointment', models.ForeignKey(orm['crm.medicalappointment'], null=False))
-        ))
-        db.create_unique('crm_client_medical_appointment', ['client_id', 'medicalappointment_id'])
-
-        # Adding M2M table for field clients on 'Client'
-        db.create_table('crm_client_clients', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('from_client', models.ForeignKey(orm['crm.client'], null=False)),
-            ('to_client', models.ForeignKey(orm['crm.client'], null=False))
-        ))
-        db.create_unique('crm_client_clients', ['from_client_id', 'to_client_id'])
-
-        # Adding model 'UserProfile'
-        db.create_table('crm_userprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('user_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal('crm', ['UserProfile'])
-
-        # Adding model 'Hostess'
-        db.create_table('crm_hostess', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-        ))
-        db.send_create_signal('crm', ['Hostess'])
-
-        # Adding model 'Address'
-        db.create_table('crm_address', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('street', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('complement', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('neighborhood', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('zip', self.gf('django.db.models.fields.CharField')(max_length=10)),
-        ))
-        db.send_create_signal('crm', ['Address'])
-
-        # Adding model 'BillingAccount'
-        db.create_table('crm_billingaccount', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('agency', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
-            ('account_number', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('bank', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='Banco', null=True, to=orm['crm.Bank'])),
-            ('account_type', self.gf('django.db.models.fields.CharField')(max_length=1, null=True, blank=True)),
-        ))
-        db.send_create_signal('crm', ['BillingAccount'])
-
-        # Adding model 'Bank'
-        db.create_table('crm_bank', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('bank_code', self.gf('django.db.models.fields.IntegerField')()),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal('crm', ['Bank'])
-
-        # Adding model 'Phone'
-        db.create_table('crm_phone', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('phone_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('phone_number', self.gf('django.db.models.fields.CharField')(max_length=14)),
-        ))
-        db.send_create_signal('crm', ['Phone'])
-
-        # Adding model 'MedicalAppointment'
-        db.create_table('crm_medicalappointment', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('appointment_date', self.gf('django.db.models.fields.DateField')()),
-            ('diagnostic', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('section_times', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('appointment_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal('crm', ['MedicalAppointment'])
-
-        # Adding M2M table for field payment_way on 'MedicalAppointment'
-        db.create_table('crm_medicalappointment_payment_way', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('medicalappointment', models.ForeignKey(orm['crm.medicalappointment'], null=False)),
-            ('paymentway', models.ForeignKey(orm['crm.paymentway'], null=False))
-        ))
-        db.create_unique('crm_medicalappointment_payment_way', ['medicalappointment_id', 'paymentway_id'])
-
-        # Adding model 'Section'
-        db.create_table('crm_section', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('medicalAppointment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['crm.MedicalAppointment'])),
-            ('section_date', self.gf('django.db.models.fields.DateField')()),
-            ('section_done', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('crm', ['Section'])
-
-        # Adding model 'PaymentWay'
-        db.create_table('crm_paymentway', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('total_payment', self.gf('django.db.models.fields.DecimalField')(max_digits=10, decimal_places=2)),
-            ('quant_parcels', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('check_number', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('check_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('payment_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('card_payment_type', self.gf('django.db.models.fields.CharField')(max_length=1, null=True, blank=True)),
-            ('paid', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('crm', ['PaymentWay'])
+        # Adding unique constraint on 'Section', fields ['section_date', 'medicalAppointment']
+        db.create_unique('crm_section', ['section_date', 'medicalAppointment_id'])
 
 
     def backwards(self, orm):
         
-        # Deleting model 'Doctor'
-        db.delete_table('crm_doctor')
-
-        # Removing M2M table for field clients on 'Doctor'
-        db.delete_table('crm_doctor_clients')
-
-        # Deleting model 'Client'
-        db.delete_table('crm_client')
-
-        # Removing M2M table for field medical_appointment on 'Client'
-        db.delete_table('crm_client_medical_appointment')
-
-        # Removing M2M table for field clients on 'Client'
-        db.delete_table('crm_client_clients')
-
-        # Deleting model 'UserProfile'
-        db.delete_table('crm_userprofile')
-
-        # Deleting model 'Hostess'
-        db.delete_table('crm_hostess')
-
-        # Deleting model 'Address'
-        db.delete_table('crm_address')
-
-        # Deleting model 'BillingAccount'
-        db.delete_table('crm_billingaccount')
-
-        # Deleting model 'Bank'
-        db.delete_table('crm_bank')
-
-        # Deleting model 'Phone'
-        db.delete_table('crm_phone')
-
-        # Deleting model 'MedicalAppointment'
-        db.delete_table('crm_medicalappointment')
-
-        # Removing M2M table for field payment_way on 'MedicalAppointment'
-        db.delete_table('crm_medicalappointment_payment_way')
-
-        # Deleting model 'Section'
-        db.delete_table('crm_section')
-
-        # Deleting model 'PaymentWay'
-        db.delete_table('crm_paymentway')
+        # Removing unique constraint on 'Section', fields ['section_date', 'medicalAppointment']
+        db.delete_unique('crm_section', ['section_date', 'medicalAppointment_id'])
 
 
     models = {
@@ -310,10 +132,10 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'crm.section': {
-            'Meta': {'ordering': "('-section_date',)", 'object_name': 'Section'},
+            'Meta': {'ordering': "('-section_date',)", 'unique_together': "(('medicalAppointment', 'section_date'),)", 'object_name': 'Section'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'medicalAppointment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['crm.MedicalAppointment']"}),
-            'section_date': ('django.db.models.fields.DateField', [], {}),
+            'section_date': ('django.db.models.fields.DateTimeField', [], {}),
             'section_done': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'crm.userprofile': {

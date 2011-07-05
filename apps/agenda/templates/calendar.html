@@ -1,0 +1,78 @@
+{% extends "site_base.html"%}
+{% load i18n %}
+
+{% block extra_head %}
+    <!-- FULLCALENDAR CSS -->
+    <link rel="stylesheet" media="screen" href="{{ STATIC_URL }}lib/fullcalendar/fullcalendar.css" />
+    <!-- FULLCALENDAR CSS END -->
+{% endblock %}
+
+{% block content %}
+    <section>
+        <header class="container_12 clearfix">
+            <div class="grid_12">
+                <h1>{% trans "Calendário" %}</h1>
+            </div>
+        </header>
+        <section class="container_12 clearfix">
+            <div class="grid_12">
+                <div id="fullcalendar"></div>
+                <div class="message info leading">
+                    To learn more about this great calendar app, <a href="http://arshaw.com/fullcalendar/">click here</a>
+                </div>
+            </div>
+        </section>
+        <footer class="container_12 clearfix">
+            <div class="grid_12">
+                Copyright &copy; 2011. Theme by <a target="_blank" href="http://themeforest.net/user/vivantdesigns?ref=vivantdesigns">VivantDesigns</a>
+            </div>
+        </footer>
+    </section>
+{% endblock %}
+
+{% block extra_javascript %}
+    <!-- FULLCALENDAR -->
+    <script type="text/javascript" src="{{ STATIC_URL }}lib/fullcalendar/jquery-ui-interactions.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}lib/fullcalendar/fullcalendar.min.js"></script>
+    <script type="text/javascript">
+	$(document).ready(function() {
+	
+		var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+        
+        dict = [{title: 'Diego', start: '2011-07-16 10:30:00', end: '2011-07-16 10:50:00'}]
+		
+		$('#fullcalendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+            titleFormat: {
+                day: "dddd, d 'd'e MMMM 'd'e yyyy" // Tuesday, Sep 8, 2009
+            },
+            defaultView: 'agendaDay',
+            dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+            dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta',
+                'Quinta', 'Sexta', 'Sábado'],
+            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'
+                , 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+			editable: true,
+			events: [
+                {% for row in json_data %}
+                    {
+                      title: "{{ row.title }}",
+                      start: "{{ row.start }}",
+                      end: "{{ row.end }}",
+                      allDay: false
+                    },
+                {% endfor %}
+                ]
+		});
+		
+	});
+    </script>
+    <!-- FULLCALENDAR END -->
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "site_base.html"%}
+{% load i18n %}
+
+{% block extra_head %}
+    <!-- DATATABLES CSS -->
+		<link rel="stylesheet" media="screen" href="{{ STATIC_URL }}lib/datatables/css/cleanslate.css" />
+	<!-- DATATABLES CSS END -->
+{% endblock %}
+
+{% block content %}
+    <section class="accordion grid_12 leading">
+		{% regroup results by table as table_list %}
+		{% for result in table_list %}
+			<header>
+				<h2>{{ result.grouper }}</h2>
+			</header>
+			<section class="clearfix">
+				{% for item in result.list%}
+					<p>
+						<b>{% trans "Serviço" %}</b>: {{ item.service.description }}
+						<b>{% trans "Preço" %}</b>: {{ item.price }}
+					</p>
+				{% endfor %}
+			</section>
+		{% endfor %}
+		<a href="{% url add_table_service %}">{% trans "Adicionar Tabela/Serviço" %}</a>
+	</section>
+
+{% endblock %}
+
+{% block extra_javascript %}
+	<!-- DATATABLES -->
+    <script type="text/javascript" src="{{ STATIC_URL }}lib/datatables/js/jquery.dataTables.js"></script> 
+    <script type="text/javascript"> 
+        $(document).ready(function() {
+            $('#example').dataTable( {
+                "sPaginationType": "full_numbers",
+				"oLanguage": {
+					"sLengthMenu": "Exibir _MENU_ registros por página",
+					"sZeroRecords": "Nenhum registro encontrado - desculpe",
+					"sInfo": "Exibindo _START_ de _END_ de _TOTAL_ registros",
+					"sInfoEmpty": "Exibindo 0 de 0 de 0 registros",
+					"sInfoFiltered": "(filtrando de _MAX_ total de registros)"
+				}
+            } );
+        } );
+    </script> 
+    <!-- DATATABLES END -->
+{% endblock %}

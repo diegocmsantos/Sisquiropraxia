@@ -128,9 +128,16 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     
     # third-party apps
-    'crm',
-    'registration',
     'south',
+    
+    # project apps
+    'apps.agenda',
+    'apps.appointments',
+    'apps.payments',
+    'apps.profiles',
+    'apps.service',
+    'registration',
+    
 )
 
 # auth settings
@@ -140,7 +147,7 @@ LOGOUT_URL = '/accounts/login/'
 
 SITE_NAME = 'Sisquiropraxia'
 
-AUTH_PROFILE_MODULE = 'crm.UserProfile'
+AUTH_PROFILE_MODULE = 'profiles.UserProfile'
 
 # Email configurations
 EMAIL_USE_TLS = True

@@ -1,0 +1,58 @@
+{% extends "site_base.html"%}
+{% load i18n %}
+
+{% block extra_head %}
+    <!-- DATATABLES CSS -->
+		<link rel="stylesheet" media="screen" href="{{ STATIC_URL }}lib/datatables/css/cleanslate.css" />
+	<!-- DATATABLES CSS END -->
+{% endblock %}
+
+{% block content %}
+    <section>
+        <header class="container_12 clearfix">
+        </header>
+        <section class="container_12 clearfix">
+            <div class="grid_12">
+                <div id="demo" class="clearfix"> 
+                    <table class="display" id="example"> 
+                        <thead> 
+                            <tr>
+                                <th>{% trans "Código" %}</th>
+                                <th>{% trans "Descrição" %}</th>
+                            </tr> 
+                        </thead> 
+                        <tbody>
+							{% for service in services %}
+								<tr class="gradeA">
+									<td>{{ service.code }}</td>
+									<td class="center">{{ service.description }}</td>
+								</tr>
+							{% endfor %}
+                        </tbody> 
+                    </table>
+					<a href="{% url add_service %}">{% trans "Adicionar Serviço" %}</a>
+                </div>
+            </div>
+        </section>
+    </section>
+{% endblock %}
+
+{% block extra_javascript %}
+	<!-- DATATABLES -->
+    <script type="text/javascript" src="{{ STATIC_URL }}lib/datatables/js/jquery.dataTables.js"></script> 
+    <script type="text/javascript"> 
+        $(document).ready(function() {
+            $('#example').dataTable( {
+                "sPaginationType": "full_numbers",
+				"oLanguage": {
+					"sLengthMenu": "Exibir _MENU_ registros por página",
+					"sZeroRecords": "Nenhum registro encontrado - desculpe",
+					"sInfo": "Exibindo _START_ de _END_ de _TOTAL_ registros",
+					"sInfoEmpty": "Exibindo 0 de 0 de 0 registros",
+					"sInfoFiltered": "(filtrando de _MAX_ total de registros)"
+				}
+            } );
+        } );
+    </script> 
+    <!-- DATATABLES END -->
+{% endblock %}

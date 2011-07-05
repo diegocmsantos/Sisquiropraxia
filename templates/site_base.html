@@ -59,7 +59,7 @@
 
         <script type = "text/javascript"> 
             document.write("<div id='loading-container'><p id='loading-content'>" +
-                           "<img id='loading-graphic' width='16' height='16' src='{{ STATIC_URL }}images/ajax-loader-eeeeee.gif' /> " +
+                           "<img id='loading-graphic' alt="" width='16' height='16' src='{{ STATIC_URL }}images/ajax-loader-eeeeee.gif' /> " +
                            "Loading...</p></div>");
         </script> 
 
@@ -68,10 +68,10 @@
     {% block header %}
     <div id="wrapper">
         <header>
-            <h1><a href="http://google.com">Sisquiropraxia</a></h1>
+            <h1><a href="/">Sisquiropraxia</a></h1>
             <nav>
 				<ul id="main-navigation" class="clearfix">
-                    {% if user.get_profile.user_type = '0' %}
+                    {% if user.is_superuser %}
                         <li class="dropdown active"> 
                             <a href="#a">Administração</a> 
                             <ul>
@@ -98,65 +98,9 @@
                                 </li> 
                             </ul> 
                         </li> 
-                        <li> 
-                            <a href="#">menu item</a> 
-                        </li> 
-                        <li class="dropdown"> 
-                            <a href="#">menu item</a> 
-                            <ul> 
-                                <li class="dropdown"> 
-                                    <a href="#">menu item</a> 
-                                    <ul> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                    </ul> 
-                                </li> 
-                                <li class="dropdown"> 
-                                    <a href="#">menu item</a> 
-                                    <ul> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                    </ul> 
-                                </li> 
-                                <li class="dropdown"> 
-                                    <a href="#">menu item</a> 
-                                    <ul> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                    </ul> 
-                                </li> 
-                                <li class="dropdown"> 
-                                    <a href="#">menu item</a> 
-                                    <ul> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                        <li><a href="#">menu item</a></li> 
-                                    </ul> 
-                                </li> 
-                            </ul> 
-                        </li> 
-                        <li class="dropdown"> 
-                            <a href="#">Themes</a> 
-                            <ul>
-                                <li><a href="dashboard.html">Lightblue</a></li> 
-                                <li><a href="gray.html">Gray</a></li> 
-                                <li><a href="dark.html">Dark</a></li> 
-                            </ul> 
-                        </li>
                     {% endif %}
                     <li class="fr dropdown"> 
-                        <a href="#" class="with-profile-image"><span><img src="{{ STATIC_URL }}images/profile-image.png" /></span>{{ user }}</a> 
+                        <a href="#" class="with-profile-image"><span><img alt="" src="{{ STATIC_URL }}images/profile-image.png" /></span>{{ user }}</a> 
                         <ul> 
                             <li><a href="#">{% trans "Configurações" %}</a></li> 
                             <li><a href="#">{% trans "Usuários" %}</a></li> 
@@ -176,7 +120,10 @@
                 <nav>
                     <ul>
                         <!-- Administrator -->
-                        {% if user.get_profile.user_type == '0' %}
+                        {% if user.get_profile.user_type == '0' or user.is_superuser %}
+                            <li class='{{ active_service_sidemenu }}'><a href="{% url list_service %}">Serviço</a></li>
+                            <li class='{{ active_table_sidemenu }}'><a href="{% url list_table %}">Tabela</a></li>
+                            <li class='{{ active_table_service_sidemenu }}'><a href="{% url list_table_service %}">Tabela/Serviço</a></li>
                             <li class='{{ active_client_sidemenu }}'><a href="{% url list_client %}">Paciente</a></li>
                             <li class='{{ active_doctor_sidemenu }}'><a href="{% url list_doctor %}">Médico</a></li>
                             <li class='{{ active_hostess_sidemenu }}'><a href="{% url list_hostess %}">Recepcionista</a></li>
@@ -718,7 +665,7 @@
 
             <!-- Main Section End -->
         {% endblock %}
-        
+        </section>
         </section>
     </div>
     

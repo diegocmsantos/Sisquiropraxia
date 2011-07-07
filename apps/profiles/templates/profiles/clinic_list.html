@@ -17,39 +17,26 @@
                     <table class="display" id="example"> 
                         <thead> 
                             <tr> 
-                                <th>{% trans "Nome" %}</th> 
-                                <th>{% trans "CPF" %}</th>
-                                <th>{% trans "Nascimento" %}</th> 
-                                <th>{% trans "Rua" %}</th> 
-                                <th>{% trans "Telefone" %}</th>
+                                <th>{% trans "Clínica" %}</th>
+                                <th>{% trans "Rua" %}</th>
+                                <th>{% trans "Responsável" %}</th>
 								<th>{% trans "Ações" %}</th> 
                             </tr> 
                         </thead> 
                         <tbody>
-							{% for client in clients %}
+							{% for clinic in object_list %}
 								<tr class="gradeA"> 
-									<td>{{ client.0.user.username }}</td> 
-									<td class="center">{{ client.0.cnpf }}</td> 
-									<td class="center">{{ client.0.birthday|date:"SHORT_DATE_FORMAT"|default:"" }}</td> 
-									<td>{{ client.0.address.street|default:"" }}</td> 
-									<td class="center">{{ client.1.0.phone_number|default:"" }}</td>
+									<td>{{ clinic.name }}</td>
+									<td class="center">{{ clinic.address.street }}</td>
+                                    <td class="center">{{ clinic.companyadmin_set.all.0.user.get_full_name }}</td> 
 									<td class="center">
-										{% if user.get_profile.user_type == '0' or user.is_superuser %}
-											{% if client.0.can_evaluation %}
-												<a href="{% url doctor_make_appointment client.0.id %}" id="" name="">consultar</a> |
-											{% endif %}
-											<a href="{% url edit_client client.0.id %}" id="" name="">editar</a>
-										{% endif %}
-										{% if user.get_profile.user_type == '3' %}
-											<a href="{% url hostess_make_appointment client.0.id %}" id="" name="">agendar</a> |
-											<a href="{% url edit_client client.0.id %}" id="" name="">editar</a>
-										{% endif %}
+										<a href="#" id="" name="">excluir</a>
 									</td>
 								</tr>
 							{% endfor %}
                         </tbody> 
                     </table>
-					<a href="{% url add_client %}">{% trans "Adicionar Paciente" %}</a>
+					<a href="{% url add_clinic %}">{% trans "Adicionar Nova Clínica" %}</a>
                 </div>
             </div>
         </section>

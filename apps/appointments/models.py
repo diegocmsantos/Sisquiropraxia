@@ -9,21 +9,22 @@ from django.conf import settings
 import datetime
 
 from apps.payments.models import PaymentWay
+from apps.service.models import TableService
 
 # Models
 
 class MedicalAppointment(models.Model):
-    APPOINTMENT_TYPE = (
-        ('', _('----------')),
-        ('0', _('Avaliação')),
-        ('1', _('Cama Termo Massageadora')),
-        ('2', _('Quiropraxia')),
+    appointment_date = models.DateField(
+        _('Data Consulta')
     )
-    appointment_date = models.DateField(_('Data Consulta'))
-    diagnostic = models.CharField(_('Diagnóstico'), max_length=255, blank=True, null=True)
-    section_times = models.IntegerField(_('Quantidade Seções'), blank=True, null=True)
-    appointment_type = models.CharField(_('Tipo de consulta'), max_length=1, \
-        choices=APPOINTMENT_TYPE)
+    diagnostic = models.CharField(
+        _('Diagnóstico'),
+        max_length=255,
+        blank=True,
+        null=True
+    )
+    quantity = models.IntegerField(_('Quantidade'), blank=True, null=True)
+    service = models.ForeignKey(TableService)
     payment_way = models.ManyToManyField(PaymentWay, related_name='Forma de pagamento', \
         blank=True, null=True)
     

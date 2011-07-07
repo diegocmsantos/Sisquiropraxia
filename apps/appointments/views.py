@@ -26,11 +26,19 @@ def make_appointment(request, client_id, form_class=DoctorMakeAppointmentForm, t
     client = get_object_or_404(Client, pk=client_id)
     context = {'title': 'Consulta'}
     context['client'] = client
-    try:
-        context['last_appointment'] = client.medical_appointment.latest('appointment_date').appointment_date
-    except:
-        context['last_appointment'] = 'Primeira consulta.'
+    #try:
+    #    context['last_appointment'] = client.medical_appointment.latest('appointment_date').appointment_date
+    #except:
+    #    context['last_appointment'] = 'Primeira consulta.'
     form = form_class()
+    
+    #bed_times = client.medical_appointment.all()[0].section_times
+    #quiro_times = client.medical_appointment.all()[1].section_times
+    #form.fields['bed_times'].initial = bed_times
+    #form.fields['quiro_times'].initial = quiro_times
+    #
+    #dict = {}
+    #form.fields['total_payment'].initial = client.appointment_cost(dict)
     
     if request.POST:
         form = form_class(request.POST)

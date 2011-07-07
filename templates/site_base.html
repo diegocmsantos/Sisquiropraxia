@@ -121,6 +121,7 @@
                     <ul>
                         <!-- Administrator -->
                         {% if user.get_profile.user_type == '0' or user.is_superuser %}
+                            <li class='{{ active_clinic_sidemenu }}'><a href="{% url list_clinic %}">Clínica</a></li>
                             <li class='{{ active_service_sidemenu }}'><a href="{% url list_service %}">Serviço</a></li>
                             <li class='{{ active_table_sidemenu }}'><a href="{% url list_table %}">Tabela</a></li>
                             <li class='{{ active_table_service_sidemenu }}'><a href="{% url list_table_service %}">Tabela/Serviço</a></li>

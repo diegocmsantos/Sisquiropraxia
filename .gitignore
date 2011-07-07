@@ -2,6 +2,8 @@
 *.DS_Store
 # Ignore .pyc python compiled file
 *.pyc
+local_settings.py
+db.sqlite3
 # except foo.html which is maintained by hand.
 !foo.html
 # Ignore objects and archives.

@@ -8,8 +8,6 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 import datetime
 
-from apps.appointments.models import MedicalAppointment
-
 # Models
 
 class Service(models.Model):

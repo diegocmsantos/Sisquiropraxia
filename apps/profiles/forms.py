@@ -2,6 +2,7 @@
 
 from django import forms
 
+from django.contrib.localflavor.br.forms import *
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _, gettext as __
@@ -55,7 +56,6 @@ class AddClientForm(forms.ModelForm):
             self.fields['account_type'].initial = self.instance.billing_account.account_type
 
     def save(self, *args, **kwargs):
-        print self.instance.user.first_name
         if self.cleaned_data['name']:
             self.instance.user.first_name = self.cleaned_data['name']
             
@@ -321,3 +321,108 @@ class AddHostessForm(forms.Form):
                 pass
             
             return user
+        
+class AddClinicForm(forms.ModelForm):
+    cnpj = BRCNPJField()
+    
+    clinic_street = forms.CharField(label=_('Rua'))
+    clinic_complement = forms.CharField(label=_('Complemento'), required=False)
+    clinic_neighborhood = forms.CharField(label=_('Bairro'))
+    clinic_state = forms.CharField(label=_('Estado'), widget=BRStateSelect())
+    clinic_city = forms.CharField(label=_('Cidade'))
+    clinic_zip = BRZipCodeField(label=_('CEP'))
+    
+    admin_name = forms.CharField(label=_('Nome Administrador'))
+    cnpf = forms.CharField(label=_('CPF'))
+    admin_username = forms.CharField(label=_('Usuário'))
+    email = forms.EmailField()
+    birthday = forms.DateField(label=_('Nascimento'), input_formats=['%d/%m/%Y'], required=False)
+    
+    admin_street = forms.CharField(label=_('Rua'))
+    admin_complement = forms.CharField(label=_('Complemento'), required=False)
+    admin_neighborhood = forms.CharField(label=_('Bairro'))
+    admin_state = forms.CharField(label=_('Estado'), widget=BRStateSelect())
+    admin_city = forms.CharField(label=_('Cidade'))
+    admin_zip = BRZipCodeField(label=_('CEP'))
+    
+    agency = forms.CharField(label=_('Agência'), required=False)
+    account_number = forms.CharField(label=_('Conta Corrente'), required=False)
+    bank = forms.ModelChoiceField(label=_('Banco'), queryset=Bank.objects.all(), required=False)
+    account_type = forms.ChoiceField(label=_('Tipo de conta'), choices=BillingAccount.ACCOUNT_TYPE_CHOICES, required=False)
+    
+    phone_home = forms.CharField(label=_('Telefone Residencial'), required=False)
+    phone_businness = forms.CharField(label=_('Telefone Comercial'), required=False)
+    phone_mobile = forms.CharField(label=_('Telefone Celular'))
+    
+    class Meta:
+        model = Clinic
+        exclude = ('address', 'owner',)
+
+    def save(self, *args, **kwargs):
+        print self.cleaned_data
+        user = User.objects.create(
+            username=self.cleaned_data['admin_username'],
+            email=self.cleaned_data['email'],
+            is_active=True,
+        )
+        name = self.cleaned_data['admin_name'].split(' ')
+        user.first_name = name[0]
+        if name.count() > 1:
+            user.last_name = name[1]
+        password = User.objects.make_random_password(length=8, \
+                allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+        user.set_password(password)
+        user.save()
+
+        self.instance.user = user
+        # self.instance.activation_key = self._make_activation_key()
+        
+        # Clinic Address
+        clinic_address = Address()
+        if self.cleaned_data:
+            clinic_address.street = self.cleaned_data.get('clinic_street','')
+            clinic_address.complement = self.cleaned_data.get('clinic_complement', '')
+            clinic_address.neighborhood = self.cleaned_data.get('clinic_neighborhood', '')
+            clinic_address.zip = self.cleaned_data.get('clinic_zip', '')
+            clinic_address.state = self.cleaned_data.get('clinic_state', '')
+            clinic_address.city = self.cleaned_data.get('clinic_city', '')
+            clinic_address.save()
+        
+        # Admin Address
+        admin_address = Address()
+        if self.cleaned_data:
+            admin_address.street = self.cleaned_data.get('admin_street','')
+            admin_address.complement = self.cleaned_data.get('admin_complement', '')
+            admin_address.neighborhood = self.cleaned_data.get('admin_neighborhood', '')
+            admin_address.zip = self.cleaned_data.get('admin_zip', '')
+            admin_address.state = self.cleaned_data.get('admin_state', '')
+            admin_address.city = self.cleaned_data.get('admin_city', '')
+            admin_address.save()
+        
+        # BillingAccount
+        billing_account = BillingAccount()
+        if self.cleaned_data:
+            billing_account.agency = self.cleaned_data['agency']
+            billing_account.account_number = self.cleaned_data['account_number']
+            billing_account.bank = self.cleaned_data['bank']
+            billing_account.account_type = self.cleaned_data['account_type']
+            billing_account.save()
+        
+        # Clinic
+        self.instance.name = self.cleaned_data['name']
+        self.instance.cnpj = self.cleaned_data['cnpj']
+        self.instance.address = clinic_address
+        self.instance.save()
+        
+        # CompanyAdmin
+        company_admin = CompanyAdmin()
+        company_admin.address = admin_address
+        company_admin.billing_account = billing_account
+        company_admin.birthday = self.cleaned_data['birthday']
+        company_admin.user = user
+        company_admin.cnpf = self.cleaned_data['cnpf']
+        company_admin.save()
+        company_admin.clinics.add(self.instance)
+        company_admin.save()
+            
+        return super(AddClinicForm, self).save(*args, **kwargs)

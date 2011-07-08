@@ -10,6 +10,7 @@ import datetime
 from utils import generate_password
 
 from apps.appointments.models import *
+from apps.service.models import Service
 
 class DoctorMakeAppointmentForm(forms.Form):
     diagnostic = forms.CharField(label=_('Diagnóstico'), widget=forms.Textarea())
@@ -31,8 +32,9 @@ class HostessMakeAppointmentForm(forms.Form):
         ('7', _('semanalmente')),
         ('30', _('mensalmente')),
     )
-    bed_times = forms.IntegerField(label=_('Seções de Cama Termo'))
-    quiro_times = forms.IntegerField(label=_('Seções de Quiropraxia'))
+    service = forms.ModelChoiceField(label=_('Servico'), \
+        queryset=Service.objects.all())
+    quantity = forms.IntegerField(label=_('Quantidade'), initial='1')
     
     payment_type = forms.ChoiceField(label=_('Tipo de pagamento'), choices=PaymentWay.PAYMENT_TYPE)
     card_payment_type = forms.ChoiceField(label=_('Tipo de cartão de crédito'), \
@@ -41,25 +43,18 @@ class HostessMakeAppointmentForm(forms.Form):
     check_date = forms.DateField(label=_('Data do cheque'), required=False)
     quant_parcels = forms.IntegerField(label=_('Quantidade de parcelas'), required=False)
     total_payment = forms.DecimalField(label=_('Valor'), max_digits=10, \
-        decimal_places=2, required=False)
+        decimal_places=2, required=False, widget = forms.TextInput(attrs={'readonly':'readonly'}))
     first_section = forms.DateTimeField(label=_('Primeira seção'))
     sections_frequency = forms.ChoiceField(label=_('Frequência'), choices=SECTIONS_FREQUENCY)
     
     def clean_first_section(self):
         data = self.cleaned_data['first_section']
-        print data
-        print 'quant sections %s' % (Section.objects.filter(section_date=data).count(),)
-        if Section.objects.filter(section_date=data).count() > 1:
-            raise forms.ValidationError(_("Conflito de horário. Por favor, tente outra data."))
+        #if Section.objects.filter(section_date=data).count() > 1:
+        #    raise forms.ValidationError(_("Conflito de horário. Por favor, tente outra data."))
 
         # Always return the cleaned data, whether you have changed it or
         # not.
         return data
-    
-    def save_sections(self, bed_appointment, quiro_appointment):
-        data = self.cleaned_data
-        _schedule(data['first_section'], data['bed_times'], data['sections_frequency'], bed_appointment)
-        _schedule(data['first_section'], data['quiro_times'], data['sections_frequency'], quiro_appointment)
     
     def save(self, client):
         data = self.cleaned_data
@@ -91,40 +86,36 @@ class HostessMakeAppointmentForm(forms.Form):
         payment_way.save()
         
         # Saving bed and quiro appointment
-        bed_appointment = _save_appointment(data['bed_times'], client, \
-            MedicalAppointment.APPOINTMENT_TYPE[2][0], payment_way=payment_way)
-        quiro_appointment = _save_appointment(data['quiro_times'], client, \
-            MedicalAppointment.APPOINTMENT_TYPE[3][0], payment_way=payment_way)
+        _save_appointment(data['first_section'], data['sections_frequency'], \
+            data['quantity'], client, data['service'], payment_way=payment_way)
         
-        # Saving bed and quiro sections
-        self.save_sections(bed_appointment, quiro_appointment)
+def _schedule(start_date, quantity, frequency, appointment, client):
+    for i in range(0, quantity):
+        appointment.id = None
+        if i == 0:
+            appointment.appointment_date = (start_date)
+        else:
+            appointment.appointment_date = (start_date + \
+                datetime.timedelta(days=int(frequency)))
+        start_date = appointment.appointment_date
+        appointment.save()
         
-def _schedule(start_date, no_section, frequency, appointment):
-    for i in range(0, no_section):
-            section = Section()
-            section.medicalAppointment = appointment
-            if i == 0:
-                section.section_date = (start_date)
-            else:
-                section.section_date = (start_date + \
-                    datetime.timedelta(days=int(frequency)))
-            start_date = section.section_date
-            section.save()
+        # Saving medical appointment in client
+        client.medical_appointment.add(appointment)
+        client.save()
         
-def _save_appointment(section_times, client, appointment_type, diagnostic=None, \
-        payment_way=None):
+def _save_appointment(start_date, frequency, quantity, client, \
+        service, diagnostic=None, payment_way=None):
+    # Getting Today
     today = datetime.datetime.today()
+    
     # Saving appointment
     appointment = MedicalAppointment()
-    appointment.appointment_date = today
     appointment.diagnostic = diagnostic
-    appointment.section_times = section_times
-    appointment.appointment_type = appointment_type
-    appointment.save()
-    if payment_way:
-        appointment.payment_way.add(payment_way)
-    appointment.save()
-    # Saving medical appointment in client
-    client.medical_appointment.add(appointment)
-    client.save()
-    return appointment
+    appointment.quantity = quantity
+    if payment_way and service:
+        appointment.services = service
+        appointment.payment_way = payment_way
+    _schedule(start_date, quantity, frequency, appointment, client)
+    
+    

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.template import RequestContext
+from django.db import transaction
 from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.translation import gettext as __
 from django.contrib import messages
@@ -16,29 +17,17 @@ import simplejson as json
 
 @login_required
 def doctor_make_appointment(request, client_id):
-    return make_appointment(request, client_id, form_class=DoctorMakeAppointmentForm, template='make_appointment.html')
+    return make_appointment(request, client_id)
     
 @login_required
 def hostess_make_appointment(request, client_id):
-    return make_appointment(request, client_id, form_class=HostessMakeAppointmentForm, template='make_appointment.html')
-    
+    return make_appointment(request, client_id, form_class=HostessMakeAppointmentForm)
+
+@transaction.commit_on_success
 def make_appointment(request, client_id, form_class=DoctorMakeAppointmentForm, template='make_appointment.html'):
     client = get_object_or_404(Client, pk=client_id)
     context = {'title': 'Consulta'}
     context['client'] = client
-    #try:
-    #    context['last_appointment'] = client.medical_appointment.latest('appointment_date').appointment_date
-    #except:
-    #    context['last_appointment'] = 'Primeira consulta.'
-    form = form_class()
-    
-    #bed_times = client.medical_appointment.all()[0].section_times
-    #quiro_times = client.medical_appointment.all()[1].section_times
-    #form.fields['bed_times'].initial = bed_times
-    #form.fields['quiro_times'].initial = quiro_times
-    #
-    #dict = {}
-    #form.fields['total_payment'].initial = client.appointment_cost(dict)
     
     if request.POST:
         form = form_class(request.POST)
@@ -52,6 +41,8 @@ def make_appointment(request, client_id, form_class=DoctorMakeAppointmentForm, t
             messages.error(request,
                 __(u'Ocorreu um erro ao tentar salvar o perfil. Verifique os campos!'))
             context['css_message'] = 'message error'
+    else:
+        form = form_class()
     
     context['form'] = form
     return render_to_response(template,

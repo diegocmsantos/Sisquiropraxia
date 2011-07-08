@@ -144,7 +144,7 @@ def add_hostess(request, form_class=AddHostessForm, template='add_hostess.html')
             hostess = form.save()
             
             messages.success(request,
-                __('Recepcionista %s criado(a) com sucesso!' % (form.cleaned_data['name'],)))
+                __('Recepcionista %s criado(a) com sucesso!' % (form.cleaned_data['first_name'],)))
             context['css_message'] = 'message success'
             form = form_class()
         else:
@@ -177,9 +177,6 @@ def add_clinic(request, form_class=AddClinicForm, template='add_clinic.html'):
         if form.is_valid():
             user = request.user
             clinic = form.save()
-            
-            vars_dict = {'first_name': user.first_name, 'username': user.username, 'password': password}
-            html_email('Cadastro no Sisquiropraxia', "add_doctor_email.html", vars_dict, 'no-reply@noreply.com', user.email)
             
             messages.success(request,
                 __(u'Clínica %s criada com sucesso!' % (form.cleaned_data['name'],)))

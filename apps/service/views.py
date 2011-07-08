@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.translation import gettext as __
@@ -8,6 +9,7 @@ from django.forms.models import model_to_dict
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 
+from apps.profiles.models import Client
 from forms import *
 from utils import html_email
 
@@ -115,3 +117,10 @@ def list_table_service(request, template="list_table_service.html"):
     return render_to_response(template,
                               context,
                               context_instance=RequestContext(request))
+
+@login_required    
+def service_price(request, client_id=None, service_id=None):
+    if service_id and client_id:
+        doc = Client.objects.get(pk=client_id).doctor_set.all()[0]
+        table_service = Service.objects.get(pk=service_id).tableservice_set.get(table=doc.table)
+    return HttpResponse(json.dumps(str(table_service.price)), mimetype='application/json')

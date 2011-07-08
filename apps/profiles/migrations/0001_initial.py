@@ -8,6 +8,46 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Adding model 'Clinic'
+        db.create_table('profiles_clinic', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('cnpj', self.gf('django.db.models.fields.CharField')(max_length=14)),
+            ('address', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['profiles.Address'])),
+        ))
+        db.send_create_signal('profiles', ['Clinic'])
+
+        # Adding model 'CompanyAdmin'
+        db.create_table('profiles_companyadmin', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('cnpf', self.gf('django.db.models.fields.CharField')(max_length=18)),
+            ('birthday', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('address', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['profiles.Address'], null=True, blank=True)),
+            ('billing_account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['profiles.BillingAccount'], null=True, blank=True)),
+        ))
+        db.send_create_signal('profiles', ['CompanyAdmin'])
+
+        # Adding M2M table for field clinics on 'CompanyAdmin'
+        db.create_table('profiles_companyadmin_clinics', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('companyadmin', models.ForeignKey(orm['profiles.companyadmin'], null=False)),
+            ('clinic', models.ForeignKey(orm['profiles.clinic'], null=False))
+        ))
+        db.create_unique('profiles_companyadmin_clinics', ['companyadmin_id', 'clinic_id'])
+
+        # Adding model 'Employees'
+        db.create_table('profiles_employees', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('cnpf', self.gf('django.db.models.fields.CharField')(max_length=18)),
+            ('birthday', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('address', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['profiles.Address'], null=True, blank=True)),
+            ('billing_account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['profiles.BillingAccount'], null=True, blank=True)),
+            ('clinic', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['profiles.Clinic'])),
+        ))
+        db.send_create_signal('profiles', ['Employees'])
+
         # Adding model 'Doctor'
         db.create_table('profiles_doctor', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -56,14 +96,6 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('profiles_client_clients', ['from_client_id', 'to_client_id'])
 
-        # Adding model 'UserProfile'
-        db.create_table('profiles_userprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('user_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal('profiles', ['UserProfile'])
-
         # Adding model 'Hostess'
         db.create_table('profiles_hostess', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -78,6 +110,8 @@ class Migration(SchemaMigration):
             ('complement', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
             ('neighborhood', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('zip', self.gf('django.db.models.fields.CharField')(max_length=10)),
+            ('state', self.gf('django.db.models.fields.CharField')(max_length=2)),
+            ('city', self.gf('django.db.models.fields.CharField')(max_length=200)),
         ))
         db.send_create_signal('profiles', ['Address'])
 
@@ -108,9 +142,29 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('profiles', ['Phone'])
 
+        # Adding model 'UserProfile'
+        db.create_table('profiles_userprofile', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('user_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
+        ))
+        db.send_create_signal('profiles', ['UserProfile'])
+
 
     def backwards(self, orm):
         
+        # Deleting model 'Clinic'
+        db.delete_table('profiles_clinic')
+
+        # Deleting model 'CompanyAdmin'
+        db.delete_table('profiles_companyadmin')
+
+        # Removing M2M table for field clinics on 'CompanyAdmin'
+        db.delete_table('profiles_companyadmin_clinics')
+
+        # Deleting model 'Employees'
+        db.delete_table('profiles_employees')
+
         # Deleting model 'Doctor'
         db.delete_table('profiles_doctor')
 
@@ -125,9 +179,6 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field clients on 'Client'
         db.delete_table('profiles_client_clients')
-
-        # Deleting model 'UserProfile'
-        db.delete_table('profiles_userprofile')
 
         # Deleting model 'Hostess'
         db.delete_table('profiles_hostess')
@@ -144,16 +195,19 @@ class Migration(SchemaMigration):
         # Deleting model 'Phone'
         db.delete_table('profiles_phone')
 
+        # Deleting model 'UserProfile'
+        db.delete_table('profiles_userprofile')
+
 
     models = {
         'appointments.medicalappointment': {
             'Meta': {'object_name': 'MedicalAppointment'},
             'appointment_date': ('django.db.models.fields.DateField', [], {}),
-            'appointment_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'diagnostic': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'payment_way': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'Forma de pagamento'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['payments.PaymentWay']"}),
-            'section_times': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'payment_way': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'Forma de pagamento'", 'to': "orm['payments.PaymentWay']"}),
+            'quantity': ('django.db.models.fields.IntegerField', [], {}),
+            'services': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['service.Service']", 'symmetrical': 'False'})
         },
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -204,9 +258,11 @@ class Migration(SchemaMigration):
         },
         'profiles.address': {
             'Meta': {'ordering': "('street',)", 'object_name': 'Address'},
+            'city': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'complement': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'neighborhood': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'state': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
             'street': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'zip': ('django.db.models.fields.CharField', [], {'max_length': '10'})
         },
@@ -235,6 +291,23 @@ class Migration(SchemaMigration):
             'medical_appointment': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['appointments.MedicalAppointment']", 'symmetrical': 'False'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
+        'profiles.clinic': {
+            'Meta': {'object_name': 'Clinic'},
+            'address': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.Address']"}),
+            'cnpj': ('django.db.models.fields.CharField', [], {'max_length': '14'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        'profiles.companyadmin': {
+            'Meta': {'object_name': 'CompanyAdmin'},
+            'address': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.Address']", 'null': 'True', 'blank': 'True'}),
+            'billing_account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.BillingAccount']", 'null': 'True', 'blank': 'True'}),
+            'birthday': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'clinics': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['profiles.Clinic']", 'symmetrical': 'False'}),
+            'cnpf': ('django.db.models.fields.CharField', [], {'max_length': '18'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
         'profiles.doctor': {
             'Meta': {'object_name': 'Doctor'},
             'address': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.Address']", 'null': 'True', 'blank': 'True'}),
@@ -245,6 +318,16 @@ class Migration(SchemaMigration):
             'crm': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'table': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['service.Table']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
+        'profiles.employees': {
+            'Meta': {'object_name': 'Employees'},
+            'address': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.Address']", 'null': 'True', 'blank': 'True'}),
+            'billing_account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.BillingAccount']", 'null': 'True', 'blank': 'True'}),
+            'birthday': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'clinic': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profiles.Clinic']"}),
+            'cnpf': ('django.db.models.fields.CharField', [], {'max_length': '18'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'profiles.hostess': {
@@ -274,9 +357,7 @@ class Migration(SchemaMigration):
         'service.table': {
             'Meta': {'object_name': 'Table'},
             'description': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'price': ('django.db.models.fields.DecimalField', [], {'max_digits': '8', 'decimal_places': '2'}),
-            'service': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['service.Service']", 'null': 'True', 'blank': 'True'})
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         }
     }
 

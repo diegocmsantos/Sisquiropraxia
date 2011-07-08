@@ -9,7 +9,7 @@ from django.conf import settings
 import datetime
 
 from apps.payments.models import PaymentWay
-from apps.service.models import TableService
+from apps.service.models import Service
 
 # Models
 
@@ -23,31 +23,19 @@ class MedicalAppointment(models.Model):
         blank=True,
         null=True
     )
-    quantity = models.IntegerField(_('Quantidade'), blank=True, null=True)
-    service = models.ForeignKey(TableService)
-    payment_way = models.ManyToManyField(PaymentWay, related_name='Forma de pagamento', \
-        blank=True, null=True)
+    quantity = models.IntegerField(_('Quantidade'))
+    services = models.ForeignKey(Service)
+    payment_way = models.ForeignKey(PaymentWay, related_name='Forma de pagamento',)
+    appointment_date = models.DateTimeField(_('Data Seção'))
+    appointment_done = models.BooleanField(default=False)
     
     class Meta:
         verbose_name = __('Consulta')
         verbose_name_plural = __('Consultas')
     
     def __unicode__(self):
-        return self.appointment_type
+        return self.services.description
     
     def get_absolute_url(self):
         return reverse('crm.views.medical_appointment',
                 kwargs={'id': self.id})
-        
-class Section(models.Model):
-    medicalAppointment = models.ForeignKey('MedicalAppointment')
-    section_date = models.DateTimeField(_('Data Seção'))
-    section_done = models.BooleanField(default=False)
-    
-    class Meta:
-        verbose_name = __('Seção')
-        verbose_name_plural = __('Seções')
-        ordering = ('-section_date',)
-    
-    def __unicode__(self):
-        return self.medicalAppointment.appointment_type

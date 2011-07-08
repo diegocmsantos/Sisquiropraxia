@@ -80,6 +80,9 @@
 			
 			// Manipular escolha do tipo de pagamento no cartão
 			card_payment_choose();
+			
+			service_choose({{ client.id }});
+			quantity_blur();
         });
 		
 		hide_fields = function() {
@@ -87,7 +90,31 @@
             $('#div_id_check_number').hide();
 			$('#div_id_check_date').hide();
 			$('#div_id_quant_parcels').hide();
-			$('#div_id_total_payment').hide();
+			// $('#div_id_total_payment').hide();
+		}
+		
+		var service_price = 0;
+		service_choose = function(client_id) {
+			$('#id_service').change(function() {
+			    $.get("/services/price/ajax/" + client_id + '/' + this.value,
+					function(data){
+						service_price = data;
+						quant = parseInt($('#id_quantity').val());
+						$('#id_total_payment').val(data * quant);
+					}
+				);
+			});
+		}
+		
+		quantity_blur = function() {
+			$('#id_quantity').blur(function() {
+				var quantity = this.value;
+				if (quantity == '' || quantity == '0') {
+					quantity = 1;
+					this.value = '1';
+				}
+				$('#id_total_payment').val(parseFloat(service_price) * parseInt(quantity));
+			});
 		}
 		
 		payment_way_choose = function() {

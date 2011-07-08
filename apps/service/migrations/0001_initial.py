@@ -20,10 +20,17 @@ class Migration(SchemaMigration):
         db.create_table('service_table', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('description', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('service', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['service.Service'], null=True, blank=True)),
-            ('price', self.gf('django.db.models.fields.DecimalField')(max_digits=8, decimal_places=2)),
         ))
         db.send_create_signal('service', ['Table'])
+
+        # Adding model 'TableService'
+        db.create_table('service_tableservice', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('table', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['service.Table'])),
+            ('service', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['service.Service'])),
+            ('price', self.gf('django.db.models.fields.DecimalField')(max_digits=8, decimal_places=2)),
+        ))
+        db.send_create_signal('service', ['TableService'])
 
 
     def backwards(self, orm):
@@ -33,6 +40,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Table'
         db.delete_table('service_table')
+
+        # Deleting model 'TableService'
+        db.delete_table('service_tableservice')
 
 
     models = {
@@ -45,9 +55,14 @@ class Migration(SchemaMigration):
         'service.table': {
             'Meta': {'object_name': 'Table'},
             'description': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        'service.tableservice': {
+            'Meta': {'object_name': 'TableService'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'price': ('django.db.models.fields.DecimalField', [], {'max_digits': '8', 'decimal_places': '2'}),
-            'service': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['service.Service']", 'null': 'True', 'blank': 'True'})
+            'service': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['service.Service']"}),
+            'table': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['service.Table']"})
         }
     }
 

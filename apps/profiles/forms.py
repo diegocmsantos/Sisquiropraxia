@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _, gettext as __
 
 import datetime
-from utils import generate_password
+from utils import generate_password, html_email
 
 from apps.profiles.models import *
 
@@ -367,7 +367,7 @@ class AddClinicForm(forms.ModelForm):
         )
         name = self.cleaned_data['admin_name'].split(' ')
         user.first_name = name[0]
-        if name.count() > 1:
+        if name.__len__() > 1:
             user.last_name = name[1]
         password = User.objects.make_random_password(length=8, \
                 allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
@@ -424,5 +424,9 @@ class AddClinicForm(forms.ModelForm):
         company_admin.save()
         company_admin.clinics.add(self.instance)
         company_admin.save()
+        
+        # Sending email
+        vars_dict = {'first_name': user.first_name, 'username': user.username, 'password': password}
+        html_email('Cadastro no Sisquiropraxia', "add_doctor_email.html", vars_dict, 'no-reply@noreply.com', user.email)
             
         return super(AddClinicForm, self).save(*args, **kwargs)

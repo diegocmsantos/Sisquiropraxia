@@ -19,6 +19,10 @@ urlpatterns = patterns('',
     url(r'^doctor/add/$', add_doctor, name='add_doctor'),
     url(r'^doctor/list/$', list_doctor, name='list_doctor'),
     
+    # Employee
+    url(r'^employee/add/$', add_employee, name='add_employee'),
+    url(r'^employee/list/$', list_employee, name='list_employee'),
+    
     # Hostess
     url(r'^hostess/add/$', add_hostess, name='add_hostess'),
     url(r'^hostess/list/$', list_hostess, name='list_hostess'),

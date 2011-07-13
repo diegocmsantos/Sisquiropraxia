@@ -46,16 +46,52 @@ class CompanyAdmin(Person):
     class Meta:
         verbose_name = __('Administrador')
         verbose_name_plural = __('Administradores')
+        permissions = (
+            # Service
+            ('can_list_service', _('Can List Service')),
+            ('can_add_service', _('Can Add Service')),
+            
+            # Table
+            ('can_list_table', _('Can List Table')),
+            ('can_add_table', _('Can Add Table')),
+            
+            # Table Service
+            ('can_list_service', _('Can List Service')),
+            ('can_add_service', _('Can Add Service')),
+            
+            # Client
+            ('can_list_client', _('Can List Client')),
+            ('can_add_client', _('Can Add Client')),
+            
+            # Partner
+            ('can_list_partner', _('Can List Partner')),
+            ('can_add_partner', _('Can Add Partner')),
+            
+            # Hostess
+            ('can_list_hostess', _('Can List Hostess')),
+            ('can_add_hostess', _('Can Add Hostess')),
+            
+            # Agenda
+            ('can_see_agenda', _('Can See Agenda')),
+        )
     
     def __unicode__(self):
         return self.user.username
 
-class Employees(Person):
+class Employee(Person):
     clinic = models.ForeignKey(Clinic)
     
     class Meta:
         verbose_name = __('Funcionário')
         verbose_name_plural = __('Funcionários')
+        permissions = (
+            # Client
+            ('can_list_client', _('Can List Client')),
+            ('can_add_client', _('Can Add Client')),
+            
+            # Agenda
+            ('can_see_agenda', _('Can See Agenda')),
+        )
     
     def __unicode__(self):
         return self.clinic.name
@@ -68,15 +104,70 @@ class Doctor(Person):
     crm = models.CharField(max_length=50)
     clients = models.ManyToManyField('Client')
     table = models.ForeignKey(Table)
+    company_admin = models.ForeignKey(CompanyAdmin)
     objects = models.Manager() # The default manager.
     doctor_clients = DoctorClientsManager() # Clients of doctor Manager
     
     def table_services(self):
         return TableService.objects.filter(table=self.table)
+        
+    def month_comission(self, month):
+        total = 0
+        for client in self.clients.all():
+            for medical_appointment in client.medical_appointment.filter(appointment_date__month=month):
+                print medical_appointment.appointment_date
+                total += (medical_appointment.table_service.price * medical_appointment.table_service.comission) / 100
+                print total
+        return total
     
+    def last_month_comission(self):
+        today = datetime.date.today()
+        return self.month_comission(today.month - 1)
+        
+    def current_month_comission(self):
+        today = datetime.date.today()
+        return self.month_comission(today.month)
+        
+    def next_month_comission(self):
+        print 'next'
+        today = datetime.date.today()
+        return self.month_comission(today.month + 1)
+        
+    def show_up_comission(self):
+        total = 0
+        show_up_clients = [client for client in self.clients.all() if client.medical_appointment.all()]
+        for show_up_client in show_up_clients:
+            for appointment in show_up_client.medical_appointment.all():
+                total += (appointment.table_service.price * appointment.table_service.comission) / 100
+        return total
+    
+    def total_comission(self):
+        total = 0
+        total_clients = [client for client in self.clients.all()]
+        for total_client in total_clients:
+            for appointment in total_client.medical_appointment.all():
+                total += (appointment.table_service.price * appointment.table_service.comission) / 100
+        return total
+    
+    def month_quant_clients(self, month):
+        return [client for client in self.clients.all() if client.medical_appointment.filter(appointment_date__month=month)]
+    
+    def last_month_quant_clients(self):
+        today = datetime.date.today()
+        return self.month_quant_clients(today.month - 1)
+        
+    def next_month_quant_clients(self):
+        today = datetime.date.today()
+        return self.month_quant_clients(today.month + 1)
+        
     class Meta:
         verbose_name = __('Médico')
         verbose_name_plural = __('Médicos')
+        permissions = (
+            # Client
+            ('can_list_client', _('Can List Client')),
+            ('can_add_client', _('Can Add Client')),
+        )
     
     def __unicode__(self):
         return self.crm
@@ -127,6 +218,11 @@ class Client(Person):
     class Meta:
         verbose_name = __('Paciente')
         verbose_name_plural = __('Pacientes')
+        permissions = (
+            # Client
+            ('can_list_client', _('Can List Client')),
+            ('can_add_client', _('Can Add Client')),
+        )
     
     def __unicode__(self):
         return 'paciente'
@@ -137,6 +233,19 @@ class Client(Person):
         
 class Hostess(models.Model):
     user = models.ForeignKey(User)
+    company_admin = models.ForeignKey(CompanyAdmin)
+    
+    class Meta:
+        verbose_name = __('Recepcionista')
+        verbose_name_plural = __('Recepcionistas')
+        permissions = (
+            # Client
+            ('can_list_client', _('Can List Client')),
+            ('can_add_client', _('Can Add Client')),
+        )
+    
+    def __unicode__(self):
+        return self.user.username
     
 class Address(models.Model):
     street = models.CharField(_('Rua'), max_length=200)

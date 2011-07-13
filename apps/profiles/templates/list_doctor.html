@@ -38,7 +38,7 @@
 							{% endfor %}
                         </tbody> 
                     </table>
-					{% if user.get_profile.user_type == '1' or user.is_superuser %}
+					{% if user.get_profile.user_type == '4' or user.is_superuser %}
 						<a href="{% url add_doctor %}">{% trans "Adicionar Parceiro" %}</a>
 					{% endif %}
                 </div>

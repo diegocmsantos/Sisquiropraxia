@@ -13,11 +13,16 @@ import datetime
 class Service(models.Model):
     code = models.CharField(
         _('Código'),
-        max_length=15
+        max_length=15,
+        unique=True
     )
     description = models.CharField(
         _('Descrição'),
         max_length=255
+    )
+    date = models.DateTimeField(
+        _('Data'),
+        auto_now_add=True
     )
     
     def __unicode__(self):
@@ -41,6 +46,11 @@ class TableService(models.Model):
     price = models.DecimalField(
         _('Preço'),
         max_digits=8,
+        decimal_places=2
+    )
+    comission = models.DecimalField(
+        _('Comissão'),
+        max_digits=4,
         decimal_places=2
     )
     

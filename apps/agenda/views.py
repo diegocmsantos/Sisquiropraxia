@@ -24,7 +24,7 @@ def calendar(request, template="calendar.html"):
     for appointment in appointments:
         client = get_object_or_404(Client, medical_appointment=appointment.pk)
         dict = {
-            'title': '%s (%s)' % (client.user.username, appointment.services.description,),
+            'title': '%s (%s)' % (client.user.username, appointment.table_service.service.description,),
             'start': str(appointment.appointment_date),
             'end': str(appointment.appointment_date + datetime.timedelta(minutes=30))
             }

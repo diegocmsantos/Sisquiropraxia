@@ -100,7 +100,7 @@
 					function(data){
 						service_price = data;
 						quant = parseInt($('#id_quantity').val());
-						$('#id_total_payment').val(data * quant);
+						$('#id_total_payment').val((data * quant).toFixed(2));
 					}
 				);
 			});
@@ -113,7 +113,7 @@
 					quantity = 1;
 					this.value = '1';
 				}
-				$('#id_total_payment').val(parseFloat(service_price) * parseInt(quantity));
+				$('#id_total_payment').val((parseFloat(service_price) * parseInt(quantity)).toFixed(2));
 			});
 		}
 		

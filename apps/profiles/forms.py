@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.localflavor.br.forms import *
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _, gettext as __
 
 import datetime
@@ -210,7 +211,7 @@ class AddDoctorForm(forms.Form):
     
     table = forms.ModelChoiceField(label=_('Tabela de preço'), queryset=Table.objects.all())
 
-    def save(self):
+    def save(self, company_admin):
         if self.cleaned_data:
             address = Address()
             address.street = self.cleaned_data['street']
@@ -251,6 +252,7 @@ class AddDoctorForm(forms.Form):
             person.table = self.cleaned_data['table']
             if self.cleaned_data['agency']:
                 person.billing_account = billing_account
+            person.company_admin = company_admin
             person.save()
             
             if self.cleaned_data['phone_mobile']:
@@ -299,26 +301,29 @@ class AddHostessForm(forms.Form):
     password = forms.CharField(label=_('Senha'), widget=forms.PasswordInput)
     confirm_password = forms.CharField(label=_('Confirmar senha'), widget=forms.PasswordInput, help_text="repita a mesma senha")
     
-    def save(self):
+    def save(self, company_admin):
         if self.cleaned_data:
             username = self.cleaned_data['username']
             email = self.cleaned_data['email']
             password = self.cleaned_data['password']
             
-            try:
-                # User
-                user = User.objects.create_user(username, email, password)
-                user.first_name = self.cleaned_data['first_name']
-                user.last_name = self.cleaned_data['last_name']
-                user.save()
-                
-                # UserProfile
-                user_profile = UserProfile()
-                user_profile.user = user
-                user_profile.user_type = 3
-                user_profile.save()
-            except:
-                pass
+            # User
+            user = User.objects.create_user(username, email, password)
+            user.first_name = self.cleaned_data['first_name']
+            user.last_name = self.cleaned_data['last_name']
+            user.save()
+            
+            # UserProfile
+            user_profile = UserProfile()
+            user_profile.user = user
+            user_profile.user_type = 3
+            user_profile.save()
+            
+            # Hostess
+            hostess = Hostess()
+            hostess.user=user
+            hostess.company_admin=company_admin
+            hostess.save()
             
             return user
         
@@ -359,7 +364,6 @@ class AddClinicForm(forms.ModelForm):
         exclude = ('address', 'owner',)
 
     def save(self, *args, **kwargs):
-        print self.cleaned_data
         user = User.objects.create(
             username=self.cleaned_data['admin_username'],
             email=self.cleaned_data['email'],
@@ -369,10 +373,20 @@ class AddClinicForm(forms.ModelForm):
         user.first_name = name[0]
         if name.__len__() > 1:
             user.last_name = name[1]
-        password = User.objects.make_random_password(length=8, \
+        
+        if settings.DEBUG:
+            password = 'diegos'
+        else:
+            password = User.objects.make_random_password(length=8, \
                 allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
         user.set_password(password)
         user.save()
+        
+        # UserProfile
+        user_profile = UserProfile()
+        user_profile.user = user
+        user_profile.user_type = '4'
+        user_profile.save()
 
         self.instance.user = user
         # self.instance.activation_key = self._make_activation_key()
@@ -430,3 +444,100 @@ class AddClinicForm(forms.ModelForm):
         html_email('Cadastro no Sisquiropraxia', "add_doctor_email.html", vars_dict, 'no-reply@noreply.com', user.email)
             
         return super(AddClinicForm, self).save(*args, **kwargs)
+        
+class AddEmployeeForm(forms.ModelForm):
+    def __init__(self, user, *args, **kwargs):
+        super(AddEmployeeForm, self).__init__(*args, **kwargs)
+        self.fields['clinic'].queryset = CompanyAdmin.objects.get(user=user).clinics
+    clinic = forms.ModelChoiceField(label=_('Clínica'), queryset=None)
+    first_name = forms.CharField(label=_('Nome'))
+    last_name = forms.CharField(label=_('Sobrenome'))
+    cnpf = forms.CharField(label=_('CPF'))
+    username = forms.CharField(label=_('Usuário'))
+    email = forms.EmailField()
+    birthday = forms.DateField(label=_('Nascimento'), input_formats=['%d/%m/%Y'], required=False)
+    
+    street = forms.CharField(label=_('Rua'))
+    complement = forms.CharField(label=_('Complemento'), required=False)
+    neighborhood = forms.CharField(label=_('Bairro'))
+    state = forms.CharField(label=_('Estado'), widget=BRStateSelect())
+    city = forms.CharField(label=_('Cidade'))
+    zip = BRZipCodeField(label=_('CEP'))
+    
+    agency = forms.CharField(label=_('Agência'), required=False)
+    account_number = forms.CharField(label=_('Conta Corrente'), required=False)
+    bank = forms.ModelChoiceField(label=_('Banco'), queryset=Bank.objects.all(), required=False)
+    account_type = forms.ChoiceField(label=_('Tipo de conta'), choices=BillingAccount.ACCOUNT_TYPE_CHOICES, required=False)
+    
+    phone_home = forms.CharField(label=_('Telefone Residencial'), required=False)
+    phone_businness = forms.CharField(label=_('Telefone Comercial'), required=False)
+    phone_mobile = forms.CharField(label=_('Telefone Celular'))
+    
+    class Meta:
+        model = Employee
+        exclude = ('user',)
+
+    def save(self, *args, **kwargs):
+        user = User.objects.create(
+            username=self.cleaned_data['username'],
+            email=self.cleaned_data['email'],
+            is_active=True,
+        )
+        name = self.cleaned_data['first_name']
+        user.first_name = name
+        user.last_name = self.cleaned_data['last_name']
+        
+        if settings.DEBUG:
+            password = 'diegos'
+        else:
+            password = User.objects.make_random_password(length=8, \
+                allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+        user.set_password(password)
+        user.save()
+        
+        # UserProfile
+        user_profile = UserProfile()
+        user_profile.user = user
+        user_profile.user_type = '5'
+        user_profile.save()
+
+        self.instance.user = user
+        # self.instance.activation_key = self._make_activation_key()
+        
+        # Clinic Address
+        address = Address()
+        if self.cleaned_data:
+            address.street = self.cleaned_data.get('street','')
+            address.complement = self.cleaned_data.get('complement', '')
+            address.neighborhood = self.cleaned_data.get('neighborhood', '')
+            address.zip = self.cleaned_data.get('zip', '')
+            address.state = self.cleaned_data.get('state', '')
+            address.city = self.cleaned_data.get('city', '')
+            address.save()
+        
+        # BillingAccount
+        billing_account = BillingAccount()
+        if self.cleaned_data['agency']:
+            billing_account.agency = self.cleaned_data['agency']
+            billing_account.account_number = self.cleaned_data['account_number']
+            billing_account.bank = self.cleaned_data['bank']
+            billing_account.account_type = self.cleaned_data['account_type']
+            billing_account.save()
+        else:
+            billing_account = None
+        
+        # Employee
+        self.instance.address = address
+        if billing_account:
+            self.instance.billing_account = billing_account
+        self.instance.birthday = self.cleaned_data['birthday']
+        self.instance.user = user
+        self.instance.cnpf = self.cleaned_data['cnpf']
+        self.instance.clinic = self.cleaned_data['clinic']
+        self.instance.save()
+        
+        # Sending email
+        vars_dict = {'first_name': user.first_name, 'username': user.username, 'password': password}
+        html_email('Cadastro no Sisquiropraxia', "add_doctor_email.html", vars_dict, 'no-reply@noreply.com', user.email)
+            
+        return super(AddEmployeeForm, self).save(*args, **kwargs)

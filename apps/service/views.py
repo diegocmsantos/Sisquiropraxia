@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.translation import gettext as __
@@ -9,7 +9,7 @@ from django.forms.models import model_to_dict
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 
-from apps.profiles.models import Client
+from apps.profiles.models import *
 from forms import *
 from utils import html_email
 
@@ -17,6 +17,13 @@ import simplejson as json
 
 @login_required
 def add_service(request, form_class=AddServiceForm, template="add_service.html"):
+    if not request.user.get_profile().user_type in ['0','4','5']:
+        context = {'title': 'Acesso Negado'}
+        template = '403.html'
+        return render_to_response(template,
+                              context,
+                              context_instance=RequestContext(request))
+        
     context = {'title': 'Paciente', 'active_service_sidemenu': 'current'}
     if request.method == 'POST':
         form = form_class(request.POST)
@@ -45,9 +52,24 @@ def add_service(request, form_class=AddServiceForm, template="add_service.html")
     
 @login_required
 def list_service(request, template="list_service.html"):
+    if not request.user.get_profile().user_type in ['0','4','5']:
+        context = {'title': 'Acesso Negado'}
+        template = '403.html'
+        return render_to_response(template,
+                              context,
+                              context_instance=RequestContext(request))
+    
     context = {'title': 'Serviço', 'active_service_sidemenu': 'current'}
-    services = Service.objects.all()
+    services = []
+    company_admin = CompanyAdmin.objects.get(user=request.user)
+    print company_admin
+    doctors = Doctor.objects.filter(company_admin=company_admin)
+    print doctors
+    for doctor in doctors:
+        for table_service in doctor.table_services:
+            services.append(table_service.service)
     context['services'] = services
+    print services
     return render_to_response(template,
                               context,
                               context_instance=RequestContext(request))
@@ -121,6 +143,8 @@ def list_table_service(request, template="list_table_service.html"):
 @login_required    
 def service_price(request, client_id=None, service_id=None):
     if service_id and client_id:
+        print 'service_id %s' % (service_id,)
+        print 'client_id %s' % (client_id,)
         doc = Client.objects.get(pk=client_id).doctor_set.all()[0]
         table_service = Service.objects.get(pk=service_id).tableservice_set.get(table=doc.table)
     return HttpResponse(json.dumps(str(table_service.price)), mimetype='application/json')

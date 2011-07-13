@@ -10,7 +10,7 @@ import datetime
 from utils import generate_password
 
 from apps.appointments.models import *
-from apps.service.models import Service
+from apps.service.models import TableService
 
 class DoctorMakeAppointmentForm(forms.Form):
     diagnostic = forms.CharField(label=_('Diagnóstico'), widget=forms.Textarea())
@@ -25,6 +25,9 @@ class DoctorMakeAppointmentForm(forms.Form):
             MedicalAppointment.APPOINTMENT_TYPE[1][0], data['diagnostic'])
     
 class HostessMakeAppointmentForm(forms.Form):
+    def __init__(self, table_services, *args, **kwargs):
+        super(HostessMakeAppointmentForm, self).__init__(*args, **kwargs)
+        self.fields['service'].queryset = table_services
     SECTIONS_FREQUENCY = (
         ('1', _('diariamente')),
         ('2', _('2 em 2 dias')),
@@ -32,8 +35,8 @@ class HostessMakeAppointmentForm(forms.Form):
         ('7', _('semanalmente')),
         ('30', _('mensalmente')),
     )
-    service = forms.ModelChoiceField(label=_('Servico'), \
-        queryset=Service.objects.all())
+    service = forms.ModelChoiceField(label=_('Serviço'), \
+        queryset=None)
     quantity = forms.IntegerField(label=_('Quantidade'), initial='1')
     
     payment_type = forms.ChoiceField(label=_('Tipo de pagamento'), choices=PaymentWay.PAYMENT_TYPE)
@@ -114,7 +117,7 @@ def _save_appointment(start_date, frequency, quantity, client, \
     appointment.diagnostic = diagnostic
     appointment.quantity = quantity
     if payment_way and service:
-        appointment.services = service
+        appointment.table_service = service
         appointment.payment_way = payment_way
     _schedule(start_date, quantity, frequency, appointment, client)
     

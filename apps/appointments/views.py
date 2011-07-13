@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from forms import *
-from apps.profiles.models import Client
+from apps.profiles.models import Client, Doctor
 from utils import html_email
 
 import simplejson as json
@@ -28,12 +28,12 @@ def make_appointment(request, client_id, form_class=DoctorMakeAppointmentForm, t
     client = get_object_or_404(Client, pk=client_id)
     context = {'title': 'Consulta'}
     context['client'] = client
-    
+    doctor = Doctor.objects.get(clients=client)
     if request.POST:
-        form = form_class(request.POST)
+        form = form_class(doctor.table_services(), request.POST)
         if form.is_valid():
             form.save(client)
-            form = form_class()
+            form = form_class(doctor.table_services())
             messages.success(request,
                 __('Consulta realizada com sucesso!'))
             context['css_message'] = 'message success'
@@ -42,7 +42,7 @@ def make_appointment(request, client_id, form_class=DoctorMakeAppointmentForm, t
                 __(u'Ocorreu um erro ao tentar salvar o perfil. Verifique os campos!'))
             context['css_message'] = 'message error'
     else:
-        form = form_class()
+        form = form_class(doctor.table_services())
     
     context['form'] = form
     return render_to_response(template,

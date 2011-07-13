@@ -119,7 +119,7 @@
             <aside>
                 <nav>
                     <ul>
-                        <!-- Administrator -->
+                        <!-- Administrator Master -->
                         <li class='{{ active_principal_sidemenu }}'><a href="/">Principal</a></li>
                         {% if user.get_profile.user_type == '0' or user.is_superuser %}
                             <li class='{{ active_clinic_sidemenu }}'><a href="{% url list_clinic %}">Clínica</a></li>
@@ -132,8 +132,20 @@
                             <li class='{{ active_agenda_sidemenu }}'><a href="{% url calendar %}">Agenda</a></li>
                         {% endif %}
                         
+                        <!-- Clinic Administrator -->
+                        {% if user.get_profile.user_type == '4' %}
+                            <li class='{{ active_employee_sidemenu }}'><a href="{% url list_employee %}">Funcionário</a></li>
+                            <li class='{{ active_service_sidemenu }}'><a href="{% url list_service %}">Serviço</a></li>
+                            <li class='{{ active_table_sidemenu }}'><a href="{% url list_table %}">Tabela</a></li>
+                            <li class='{{ active_table_service_sidemenu }}'><a href="{% url list_table_service %}">Tabela/Serviço</a></li>
+                            <li class='{{ active_client_sidemenu }}'><a href="{% url list_client %}">Cliente</a></li>
+                            <li class='{{ active_doctor_sidemenu }}'><a href="{% url list_doctor %}">Parceiro</a></li>
+                            <li class='{{ active_hostess_sidemenu }}'><a href="{% url list_hostess %}">Recepcionista</a></li>
+                            <li class='{{ active_agenda_sidemenu }}'><a href="{% url calendar %}">Agenda</a></li>
+                        {% endif %}
+                        
                         <!-- Doctor -->
-                        {% if user.get_profile.user_type == '1' %}
+                        {% if user.get_profile.user_type in '15' %}
                             <li class='{{ active_client_sidemenu }}'><a href="{% url list_client %}">Paciente</a></li>
                         {% endif %}
                         
@@ -168,7 +180,7 @@
                         <section>
                         {% for message in messages %}
                             <div class="{{ css_message }}"> 
-                                <h3>Mensagem!</h3> 
+                                <!-- <h3>Mensagem!</h3> -->
                                 <p> {{ message }}</p> 
                             </div>
                         {% endfor %}
@@ -192,118 +204,8 @@
                                 <li>sit amet</li> 
                             </ol>
                         </div>
-                    </section> 
-                
-                    <section class="portlet grid_6 leading"> 
- 
-                        <header>
-                            <h2>{% trans "Estatísticas" %}</h2> 
-                        </header>
-                        
-                        <section>
-                            <table class="full"> 
- 
-                                <tbody> 
- 
-                                    <tr> 
- 
-                                        <td>{% trans "Total de indicações" %}</td> 
- 
-                                        <td class="ar"><a href="#">30</a></td> 
- 
-                                        <td class="ar">1,498.50 $</td> 
- 
-                                    </tr> 
- 
-                                    <tr> 
- 
-                                        <td>{% trans "Indicações concluídas" %}</td> 
- 
-                                        <td class="ar"><a href="#">25</a></td> 
- 
-                                        <td class="ar">1,248.75 $</td> 
- 
-                                    </tr> 
- 
-                                    <tr> 
- 
-                                        <td>{% trans "Indicações não concluídas" %}</td> 
- 
-                                        <td class="ar"><a href="#">5</a></td> 
- 
-                                        <td class="ar">249.75 $</td> 
- 
-                                    </tr>
- 
-                                </tbody> 
- 
-                            </table>
-                            
-                        </section>
-                        
-                    </section> 
- 
-                    <section class="portlet grid_6 leading"> 
-
-                        <header>
-                            <h2>Financeiro</h2>
-                        </header>
-
-                        <section>
-                            <table class="full"> 
- 
-                                <tbody> 
- 
-                                    <tr> 
- 
-                                        <td>a receber (mensal)</td> 
- 
-                                        <td class="ar"><a href="#">{{ current_month_quant_clients }}</a></td>
- 
-                                        <td class="ar">{{ current_month_commission }}</td>
- 
-                                    </tr> 
- 
-                                    <tr> 
- 
-                                        <td>recebido (mês passado)</td> 
- 
-                                        <td class="ar"><a href="#">{{ last_month_quant_clients }}</a></td> 
- 
-                                        <td class="ar">R$ {{ last_month_comission }}</td> 
- 
-                                    </tr> 
- 
-                                    <tr> 
- 
-                                        <td>Signups This Year</td> 
- 
-                                        <td class="ar"><a href="#">30</a></td> 
- 
-                                        <td class="ar"></td> 
- 
-                                    </tr> 
- 
-                                    <tr> 
- 
-                                        <td>Sales This Year</td> 
- 
-                                        <td class="ar"><a href="#">25</a></td> 
- 
-                                        <td class="ar">1,248.75 $</td> 
- 
-                                    </tr> 
- 
-                                </tbody> 
- 
-                            </table>
-                            
-                        </section>
-
-                    </section> 
- 
-                    <div class="clear"></div>
-
+                    </section>
+                    
                     <section class="portlet grid_6 leading"> 
  
                         <header>
@@ -342,6 +244,67 @@
                             </table>
                         </section>
                     </section>
+ 
+                    <section class="portlet grid_6 leading"> 
+
+                        <header>
+                            <h2>Financeiro</h2>
+                        </header>
+
+                        <section>
+                            <table class="full"> 
+ 
+                                <tbody>
+                                    
+                                    <tr> 
+ 
+                                        <td>a receber (próximo mensal)</td>
+ 
+                                        <td class="ar"><a href="#"></a></td>
+ 
+                                        <td class="ar">R$ {{ next_month_comission }}</td>
+ 
+                                    </tr>
+ 
+                                    <tr> 
+ 
+                                        <td>a receber (mensal)</td> 
+ 
+                                        <td class="ar"><a href="#">{{ show_up_quant }}</a></td>
+ 
+                                        <td class="ar">R$ {{ current_month_comission }}</td>
+ 
+                                    </tr> 
+ 
+                                    <tr> 
+ 
+                                        <td>recebido (mês passado)</td> 
+ 
+                                        <td class="ar"><a href="#">{{ last_month_quant_clients }}</a></td> 
+ 
+                                        <td class="ar">R$ {{ last_month_comission }}</td> 
+ 
+                                    </tr> 
+ 
+                                    <tr> 
+ 
+                                        <td>Total de indicações</td> 
+ 
+                                        <td class="ar"><a href="#">{{ total_clients }}</a></td> 
+ 
+                                        <td class="ar">R$ {{ show_up_comission }}</td>
+ 
+                                    </tr>
+ 
+                                </tbody> 
+ 
+                            </table>
+                            
+                        </section>
+
+                    </section> 
+ 
+                    <div class="clear"></div>
  
                     <section class="portlet grid_6 leading"> 
 

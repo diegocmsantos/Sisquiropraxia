@@ -172,8 +172,11 @@ def add_hostess(request, form_class=AddHostessForm, template='add_hostess.html')
 @login_required
 def list_hostess(request, template='list_hostess.html'):
     context = {'title': 'Recepcionistas', 'active_hostess_sidemenu': 'current'}
-    company_admin = CompanyAdmin.objects.get(user=request.user)
-    hostess = Hostess.objects.filter(company_admin=company_admin)
+    try:
+        company_admin = CompanyAdmin.objects.get(user=request.user)
+        hostess = Hostess.objects.filter(company_admin=company_admin)
+    except CompanyAdmin.DoesNotExist:
+        hostess = Hostess.objects.all()
     context['hostesses'] = hostess
     return render_to_response(template,
                               context,

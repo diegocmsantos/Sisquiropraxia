@@ -136,7 +136,7 @@ def list_doctor(request, template='list_doctor.html'):
     if user.get_profile().user_type == '4':
         company_admin = user.companyadmin_set.all()[0]
         doctors = Doctor.objects.filter(company_admin=company_admin)
-    elif user.is_superuser():
+    elif user.is_superuser:
         doctors = Doctor.objects.all()
     context['doctors'] = doctors
     return render_to_response(template,

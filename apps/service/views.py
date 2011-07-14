@@ -61,10 +61,11 @@ def list_service(request, template="list_service.html"):
     
     context = {'title': 'Serviço', 'active_service_sidemenu': 'current'}
     services = []
-    company_admin = CompanyAdmin.objects.get(user=request.user)
-    print company_admin
-    doctors = Doctor.objects.filter(company_admin=company_admin)
-    print doctors
+    try:
+        company_admin = CompanyAdmin.objects.get(user=request.user)
+        doctors = Doctor.objects.filter(company_admin=company_admin)
+    except CompanyAdmin.DoesNotExist:
+        doctors = Doctor.objects.all()
     for doctor in doctors:
         for table_service in doctor.table_services:
             services.append(table_service.service)

@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 
 from forms import *
-from utils import html_email
+from utils import html_email, format_cnpf
 
 import simplejson as json
 
@@ -188,7 +188,6 @@ def add_clinic(request, form_class=AddClinicForm, template='add_clinic.html'):
     context = {'title': 'Clínica'}
     if request.method == 'POST':
         form = form_class(request.POST)
-
         if form.is_valid():
             user = request.user
             clinic = form.save()

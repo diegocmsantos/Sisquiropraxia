@@ -9,7 +9,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _, gettext as __
 
 import datetime
-from utils import generate_password, html_email
+from utils import generate_password, html_email, format_cnpf
 
 from apps.profiles.models import *
 
@@ -424,7 +424,7 @@ class AddClinicForm(forms.ModelForm):
         
         # Clinic
         self.instance.name = self.cleaned_data['name']
-        self.instance.cnpj = self.cleaned_data['cnpj']
+        self.instance.cnpj = format_cnpf(self.cleaned_data['cnpj'])
         self.instance.address = clinic_address
         self.instance.save()
         

@@ -14,10 +14,10 @@
 				<!-- Tabs -->
 				<section class="tabs side grid_12 leading">
 					<ul class="clearfix">
-						<li><a href="#">{% trans "Clínica" %}</a></li>
-						<li><a href="#">{% trans "Administrador" %}</a></li>
-						<li><a href="#">{% trans "Conta Bancária" %}</a></li>
-						<li><a href="#">{% trans "Telefone" %}</a></li>
+						<li><a id="clinic_tab" href="#">{% trans "Clínica" %}</a></li>
+						<li><a id="admin_tab" href="#">{% trans "Administrador" %}</a></li>
+						<li><a id="account_tab" href="#">{% trans "Conta Bancária" %}</a></li>
+						<li><a id="phone_tab" href="#">{% trans "Telefone" %}</a></li>
 					</ul>
 					<section>
 						<section class="clearfix">
@@ -126,6 +126,11 @@
 							</div>
 							<!-- End clinic_zip -->
 							
+							<!-- next button -->
+							<div class="form-action clearfix">
+								<button id="clinic_next" class="button" type="button" data-icon-primary="ui-icon-circle-check">{% trans "Próximo >>" %}</button>
+							</div>
+							<!-- End next button -->
 						</section>
 						
 						<section class="clearfix">
@@ -178,89 +183,12 @@
 							</div>
 							<!-- End email -->
 							
-							<!-- birthday -->
-							<label for="form-name" class="form-label">{{ form.birthday.label }} {% if form.birthday.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.birthday.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.birthday }}
-								{% if form.birthday.errors %}
-									<div class="message error" >{{ form.birthday.errors }}</div>
-								{% endif %}
+							<!-- next button -->
+							<div class="form-action clearfix">
+								<button id="admin_back" class="button" type="button" data-icon-primary="ui-icon-circle-check">{% trans "<< Voltar" %}</button>
+								<button id="admin_next" class="button" type="button" data-icon-primary="ui-icon-circle-check">{% trans "Próximo >>" %}</button>
 							</div>
-							<!-- End email -->
-							
-							<!-- admin_street -->
-							<label for="form-name" class="form-label">{{ form.admin_street.label }} {% if form.admin_street.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.admin_street.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.admin_street }}
-								{% if form.admin_street.errors %}
-									<div class="message error" >{{ form.admin_street.errors }}</div>
-								{% endif %}
-							</div>
-							<!-- End admin_street -->
-							
-							<!-- admin_complement -->
-							<label for="form-name" class="form-label">{{ form.admin_complement.label }} {% if form.admin_complement.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.admin_complement.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.admin_complement }}
-								{% if form.admin_complement.errors %}
-									<div class="message error" >{{ form.admin_complement.errors }}</div>
-								{% endif %}
-							</div>
-							<!-- End admin_complement -->
-							
-							<!-- admin_neighborhood -->
-							<label for="form-name" class="form-label">{{ form.admin_neighborhood.label }} {% if form.admin_neighborhood.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.admin_neighborhood.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.admin_neighborhood }}
-								{% if form.admin_neighborhood.errors %}
-									<div class="message error" >{{ form.admin_neighborhood.errors }}</div>
-								{% endif %}
-							</div>
-							<!-- End admin_neighborhood -->
-							
-							<!-- admin_state -->
-							<label for="form-name" class="form-label">{{ form.admin_state.label }} {% if form.admin_state.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.admin_state.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.admin_state }}
-								{% if form.admin_state.errors %}
-									<div class="message error" >{{ form.admin_state.errors }}</div>
-								{% endif %}
-							</div>
-							<!-- End admin_state -->
-							
-							<!-- admin_city -->
-							<label for="form-name" class="form-label">{{ form.admin_city.label }} {% if form.admin_city.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.admin_city.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.admin_city }}
-								{% if form.admin_city.errors %}
-									<div class="message error" >{{ form.admin_city.errors }}</div>
-								{% endif %}
-							</div>
-							<!-- End admin_city -->
-							
-							<!-- admin_zip -->
-							<label for="form-name" class="form-label">{{ form.admin_zip.label }} {% if form.admin_zip.field.required %}<em>*</em>{% endif %}
-								<small>{{ form.admin_zip.field.help_text }}</small>
-							</label>
-							<div class="form-input">
-								{{ form.admin_zip }}
-								{% if form.admin_zip.errors %}
-									<div class="message error" >{{ form.admin_zip.errors }}</div>
-								{% endif %}
-							</div>
-							<!-- End admin_zip -->
+							<!-- End next button -->
 							
 						</section>
 						
@@ -314,7 +242,15 @@
 							</div>
 							<!-- End account_type -->
 							
+							<!-- next button -->
+							<div class="form-action clearfix">
+								<button id="account_back" class="button" type="button" data-icon-primary="ui-icon-circle-check">{% trans "<< Voltar" %}</button>
+								<button id="account_next" class="button" type="button" data-icon-primary="ui-icon-circle-check">{% trans "Próximo >>" %}</button>
+							</div>
+							<!-- End next button -->
+							
 						</section>
+						
 						<section class="clearfix">
 							
 							<!-- phone_home -->
@@ -353,18 +289,17 @@
 							</div>
 							<!-- End phone_mobile -->
 							
+							<!-- next button -->
+							<div class="form-action clearfix">
+								<button id="phone_back" class="button" type="button" data-icon-primary="ui-icon-circle-check">{% trans "<< Voltar" %}</button>
+								<button class="button" type="submit" data-icon-primary="ui-icon-circle-check">{% trans "Salvar" %}</button>
+							</div>
+							<!-- End next button -->
+							
 						</section>
 					</section>
 				</section>
 				<!-- End Tabs -->
-				
-				<div class="form-action clearfix">
-
-					<button class="button" type="submit" data-icon-primary="ui-icon-circle-check">{% trans "Salvar" %}</button>
-
-					<button class="button" type="reset">{% trans "Limpar" %}</button>
-
-				</div>
 				
 			</form>
 		</section>
@@ -377,10 +312,43 @@
 	
 	<script type="text/javascript">
         $(document).ready(function() {
+			$('#id_cnpj').mask('99.999.999/9999-99');
+			$('#id_clinic_zip').mask('99999-999');
             $('#id_cnpf').mask('999.999.999-99');
             $('#id_birthday').mask('99/99/9999');
             $('#id_zip').mask('99.999-999');
             $("input[name^='phone']").mask('(99)9999-9999');
+			
+			$('#id_cnpj').blur(function() {
+				this.value = this.value
+					.replace('.', '')
+					.replace('.', '')
+					.replace('/', '')
+					.replace('-', '');
+			});
+			
+			$('#clinic_next').click(function() {
+				$('#admin_tab').trigger('click');
+			});
+			
+			
+			$('#admin_back').click(function() {
+				$('#clinic_tab').trigger('click');
+			});
+			$('#admin_next').click(function() {
+				$('#account_tab').trigger('click');
+			});
+			
+			$('#account_back').click(function() {
+				$('#admin_tab').trigger('click');
+			});
+			$('#account_next').click(function() {
+				$('#phone_tab').trigger('click');
+			});
+			
+			$('#phone_back').click(function() {
+				$('#account_tab').trigger('click');
+			});
         });
     </script>
 {% endblock %}

@@ -248,12 +248,12 @@ class Hostess(models.Model):
         return self.user.username
     
 class Address(models.Model):
-    street = models.CharField(_('Rua'), max_length=200)
-    complement = models.CharField(_('Complemento'), max_length=100, blank=True)
-    neighborhood = models.CharField(_('Bairro'), max_length=100)
-    zip = models.CharField(_('CEP'), max_length=10)
-    state = models.CharField(_('Estado'), max_length=2, choices=STATE_CHOICES)
-    city = models.CharField(_('Cidade'), max_length=200)
+    street = models.CharField(_('Rua'), max_length=200, null=True, blank=True)
+    complement = models.CharField(_('Complemento'), max_length=100, null=True, blank=True)
+    neighborhood = models.CharField(_('Bairro'), max_length=100, null=True, blank=True)
+    zip = models.CharField(_('CEP'), max_length=10, null=True, blank=True)
+    state = models.CharField(_('Estado'), max_length=2, choices=STATE_CHOICES, null=True, blank=True)
+    city = models.CharField(_('Cidade'), max_length=200, null=True, blank=True)
     
     class Meta:
         verbose_name = __('Endereço')

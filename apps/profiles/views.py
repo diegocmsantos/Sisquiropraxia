@@ -188,6 +188,7 @@ def add_clinic(request, form_class=AddClinicForm, template='add_clinic.html'):
     context = {'title': 'Clínica'}
     if request.method == 'POST':
         form = form_class(request.POST)
+        
         if form.is_valid():
             user = request.user
             clinic = form.save()

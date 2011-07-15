@@ -343,12 +343,12 @@ class AddClinicForm(forms.ModelForm):
     email = forms.EmailField()
     birthday = forms.DateField(label=_('Nascimento'), input_formats=['%d/%m/%Y'], required=False)
     
-    admin_street = forms.CharField(label=_('Rua'))
+    admin_street = forms.CharField(label=_('Rua'), required=False)
     admin_complement = forms.CharField(label=_('Complemento'), required=False)
-    admin_neighborhood = forms.CharField(label=_('Bairro'))
-    admin_state = forms.CharField(label=_('Estado'), widget=BRStateSelect())
-    admin_city = forms.CharField(label=_('Cidade'))
-    admin_zip = BRZipCodeField(label=_('CEP'))
+    admin_neighborhood = forms.CharField(label=_('Bairro'), required=False)
+    admin_state = forms.CharField(label=_('Estado'), widget=BRStateSelect(), required=False)
+    admin_city = forms.CharField(label=_('Cidade'), required=False)
+    admin_zip = BRZipCodeField(label=_('CEP'), required=False)
     
     agency = forms.CharField(label=_('Agência'), required=False)
     account_number = forms.CharField(label=_('Conta Corrente'), required=False)
